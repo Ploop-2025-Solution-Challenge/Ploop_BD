@@ -1,10 +1,10 @@
 package com.example.ploop_backend.domain.user.model;
 
 public enum Role {
-    USER("ROLE_USER"),
-    ADMIN("ROLE_ADMIN");
+    USER,
+    ADMIN;
 
-    private final String value;
+    /*private final String value;
 
     Role(String value) {
         this.value = value;
@@ -12,5 +12,5 @@ public enum Role {
 
     public String getValue() {
         return value;
-    }
+    }*/
 }

@@ -1,6 +1,7 @@
 package com.example.ploop_backend.service;
 
 import com.google.api.client.json.jackson2.JacksonFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -15,7 +16,8 @@ import java.util.Collections;
 @Component
 public class GoogleTokenVerifier {
 
-    private static final String CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID";
+    @Value("${google.clientId}")
+    private String clientId;
 
 
     public GoogleUser verify(String idTokenString) {
@@ -23,7 +25,7 @@ public class GoogleTokenVerifier {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
                     GoogleNetHttpTransport.newTrustedTransport(),
                     JacksonFactory.getDefaultInstance())
-                    .setAudience(Collections.singletonList(CLIENT_ID))
+                    .setAudience(Collections.singletonList(clientId))
                     .build();
 
             GoogleIdToken idToken = verifier.verify(idTokenString);

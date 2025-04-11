@@ -22,7 +22,7 @@ public class PloopBackendApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		User user = User.builder()
+		/*User user = User.builder()
 				.email("test@google.com")
 				.googleId("123456")
 				.name("테스트 유저")
@@ -32,9 +32,9 @@ public class PloopBackendApplication implements CommandLineRunner {
 				.region("서울")
 				.picture("https://example.com/profile.jpg")
 				.role(Role.USER)
-				.build();
+				.build();*/
 
-		userRepository.save(user);
+		//userRepository.save(user);
 	}
 }
 
