@@ -17,3 +17,6 @@ spring:
   logging:
     level:
       org.hibernate.SQL: debug
+
+google:
+    clientId: 226017564204-otrfeolq0t7gotr7vaemchggh5ts3vb9.apps.googleusercontent.com
