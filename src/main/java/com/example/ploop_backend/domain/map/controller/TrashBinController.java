@@ -5,6 +5,7 @@ import com.example.ploop_backend.domain.map.service.TrashBinService;
 import com.example.ploop_backend.domain.map.service.UserSettingsService;
 import com.example.ploop_backend.domain.user.entity.User;
 import com.example.ploop_backend.dto.map.TrashBinMarkerDto;
+import com.example.ploop_backend.dto.map.TrashBinVisibilityDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -70,15 +71,21 @@ public class TrashBinController {
 
     // 쓰레기통 보이기/숨기기 토글
     @PatchMapping("/visible")
-    public ResponseEntity<Boolean> toggleVisibility(@AuthenticationPrincipal User user) {
+    public ResponseEntity<TrashBinVisibilityDto> toggleVisibility(@AuthenticationPrincipal User user) {
         boolean visible = userSettingsService.toggleTrashBinVisibility(user);
-        return ResponseEntity.ok(visible);
+        //return ResponseEntity.ok(visible);
+        return ResponseEntity.ok(new TrashBinVisibilityDto(visible));
     }
 
     // 쓰레기통 보이기/숨기기 상태 조회
-    @GetMapping("/visible")
+    /*@GetMapping("/visible")
     public ResponseEntity<Boolean> getVisibility(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(userSettingsService.getTrashBinVisibility(user));
+    }*/
+    @GetMapping("/visible")
+    public ResponseEntity<TrashBinVisibilityDto> getVisibility(@AuthenticationPrincipal User user) {
+        boolean visible = userSettingsService.getTrashBinVisibility(user);
+        return ResponseEntity.ok(new TrashBinVisibilityDto(visible));
     }
 
 }
