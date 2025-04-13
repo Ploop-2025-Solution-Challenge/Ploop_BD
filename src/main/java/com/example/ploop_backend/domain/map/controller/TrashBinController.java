@@ -1,0 +1,45 @@
+package com.example.ploop_backend.domain.map.controller;
+
+import com.example.ploop_backend.domain.map.entity.TrashBin;
+import com.example.ploop_backend.domain.map.service.TrashBinService;
+import com.example.ploop_backend.domain.user.entity.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/map/bin")
+public class TrashBinController {
+
+    private final TrashBinService trashBinService;
+
+    // 쓰레기통 등록
+    @PostMapping
+    public ResponseEntity<TrashBin> registerTrashBin(
+            @AuthenticationPrincipal User user,
+            @RequestParam("image") MultipartFile image,
+            @RequestParam("latitude") double latitude,
+            @RequestParam("longitude") double longitude
+    ) {
+        TrashBin saved = trashBinService.registerTrashBin(user, image, latitude, longitude);
+        return ResponseEntity.ok(saved);
+    }
+
+    // 쓰레기통 전체 조회
+    @GetMapping
+    public ResponseEntity<List<TrashBin>> getAllBins() {
+        return ResponseEntity.ok(trashBinService.getAllTrashBins());
+    }
+
+    // 쓰레기통 삭제 (누구나 가능)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteBin(@PathVariable Long id) {
+        trashBinService.deleteTrashBin(id, null);
+        return ResponseEntity.ok().build();
+    }
+}
