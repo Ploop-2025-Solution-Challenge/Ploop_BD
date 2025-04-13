@@ -2,6 +2,7 @@ package com.example.ploop_backend.domain.map.controller;
 
 import com.example.ploop_backend.domain.map.entity.TrashBin;
 import com.example.ploop_backend.domain.map.service.TrashBinService;
+import com.example.ploop_backend.domain.map.service.UserSettingsService;
 import com.example.ploop_backend.domain.user.entity.User;
 import com.example.ploop_backend.dto.map.TrashBinMarkerDto;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,6 +20,7 @@ import java.util.List;
 public class TrashBinController {
 
     private final TrashBinService trashBinService;
+    private final UserSettingsService userSettingsService;
 
     // 쓰레기통 등록
     @PostMapping
@@ -37,7 +40,7 @@ public class TrashBinController {
         return ResponseEntity.ok(trashBinService.getAllTrashBins());
     }*/
 
-    // 쓰레기통 전체 조회 DTO 변환
+    // 쓰레기통 마커 전체 조회 DTO 변환
     @GetMapping
     public ResponseEntity<List<TrashBinMarkerDto>> getAllBins() {
         List<TrashBin> bins = trashBinService.getAllTrashBins();
@@ -57,6 +60,25 @@ public class TrashBinController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBin(@PathVariable Long id) {
         trashBinService.deleteTrashBin(id, null);
-        return ResponseEntity.ok().build();
+        //return ResponseEntity.ok().build();
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", "success",
+                        "message", "쓰레기통이 삭제되었습니다."
+                ));
     }
+
+    // 쓰레기통 보이기/숨기기 토글
+    @PatchMapping("/visible")
+    public ResponseEntity<Boolean> toggleVisibility(@AuthenticationPrincipal User user) {
+        boolean visible = userSettingsService.toggleTrashBinVisibility(user);
+        return ResponseEntity.ok(visible);
+    }
+
+    // 쓰레기통 보이기/숨기기 상태 조회
+    @GetMapping("/visible")
+    public ResponseEntity<Boolean> getVisibility(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userSettingsService.getTrashBinVisibility(user));
+    }
+
 }
