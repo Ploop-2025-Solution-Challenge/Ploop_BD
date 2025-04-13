@@ -3,6 +3,7 @@ package com.example.ploop_backend.domain.map.controller;
 import com.example.ploop_backend.domain.map.entity.TrashBin;
 import com.example.ploop_backend.domain.map.service.TrashBinService;
 import com.example.ploop_backend.domain.user.entity.User;
+import com.example.ploop_backend.dto.map.TrashBinMarkerDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,11 +31,27 @@ public class TrashBinController {
         return ResponseEntity.ok(saved);
     }
 
-    // 쓰레기통 전체 조회
+    /* // 쓰레기통 전체 조회
     @GetMapping
     public ResponseEntity<List<TrashBin>> getAllBins() {
         return ResponseEntity.ok(trashBinService.getAllTrashBins());
+    }*/
+
+    // 쓰레기통 전체 조회 DTO 변환
+    @GetMapping
+    public ResponseEntity<List<TrashBinMarkerDto>> getAllBins() {
+        List<TrashBin> bins = trashBinService.getAllTrashBins();
+        List<TrashBinMarkerDto> result = bins.stream()
+                .map(bin -> new TrashBinMarkerDto(
+                        bin.getId(),
+                        bin.getLatitude(),
+                        bin.getLongitude(),
+                        bin.getImageUrl()))
+                .toList();
+
+        return ResponseEntity.ok(result);
     }
+
 
     // 쓰레기통 삭제 (누구나 가능)
     @DeleteMapping("/{id}")
