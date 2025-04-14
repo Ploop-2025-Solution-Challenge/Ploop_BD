@@ -1,8 +1,8 @@
-package com.example.ploop_backend.controller;
+package com.example.ploop_backend.domain.auth.controller;
 
 import com.example.ploop_backend.dto.auth.JwtResponseDto;
 import com.example.ploop_backend.dto.auth.TokenRequestDto;
-import com.example.ploop_backend.service.AuthService;
+import com.example.ploop_backend.domain.auth.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
