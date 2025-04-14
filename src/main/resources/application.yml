@@ -1,9 +1,16 @@
 spring:
+  server:
+    #port: 8081 # local 실행시
   datasource:
-    url: jdbc:mysql://mysql:3307/ploggingdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://mysql:3306/ploopdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: plogger
     password: plogger1234
     driver-class-name: com.mysql.cj.jdbc.Driver
+    profiles:
+      active: local
+    hikari:
+      connection-timeout: 30000  # 30초까지 대기
+      initialization-fail-timeout: -1  # 실패해도 재시도
 
   jpa:
     hibernate:
