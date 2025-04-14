@@ -1,4 +1,4 @@
-package com.example.ploop_backend.service;
+package com.example.ploop_backend.domain.user.service;
 
 import com.example.ploop_backend.domain.user.entity.User;
 import com.example.ploop_backend.dto.user.UpdateUserProfileRequest;
