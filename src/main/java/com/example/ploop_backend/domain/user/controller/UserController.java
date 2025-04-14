@@ -1,8 +1,8 @@
-package com.example.ploop_backend.controller;
+package com.example.ploop_backend.domain.user.controller;
 
 import com.example.ploop_backend.domain.user.entity.User;
 import com.example.ploop_backend.dto.user.UpdateUserProfileRequest;
-import com.example.ploop_backend.service.UserService;
+import com.example.ploop_backend.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
