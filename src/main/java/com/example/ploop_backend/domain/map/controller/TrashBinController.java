@@ -7,6 +7,7 @@ import com.example.ploop_backend.domain.user.entity.User;
 import com.example.ploop_backend.dto.map.TrashBinMarkerDto;
 import com.example.ploop_backend.dto.map.TrashBinVisibilityDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -24,22 +25,20 @@ public class TrashBinController {
     private final UserSettingsService userSettingsService;
 
     // 쓰레기통 등록
-    @PostMapping
-    public ResponseEntity<TrashBin> registerTrashBin(
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> registerTrashBin(
             @AuthenticationPrincipal User user,
             @RequestParam("image") MultipartFile image,
             @RequestParam("latitude") double latitude,
             @RequestParam("longitude") double longitude
     ) {
+        if (user == null) {
+            return ResponseEntity.status(401).body("인증되지 않은 사용자입니다.");
+        }
+        System.out.println("🔥🔥🔥🔥🔥🔥 컨트롤러 도달함");
         TrashBin saved = trashBinService.registerTrashBin(user, image, latitude, longitude);
         return ResponseEntity.ok(saved);
     }
-
-    /* // 쓰레기통 전체 조회
-    @GetMapping
-    public ResponseEntity<List<TrashBin>> getAllBins() {
-        return ResponseEntity.ok(trashBinService.getAllTrashBins());
-    }*/
 
     // 쓰레기통 마커 전체 조회 DTO 변환
     @GetMapping

@@ -1,6 +1,7 @@
 spring:
   server:
-    #port: 8081 # local 실행시
+    tomcat:
+      max-swallow-size: -1
   datasource:
     url: jdbc:mysql://mysql:3306/ploopdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: plogger
@@ -11,6 +12,11 @@ spring:
     hikari:
       connection-timeout: 30000  # 30초까지 대기
       initialization-fail-timeout: -1  # 실패해도 재시도
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 15MB
 
   jpa:
     hibernate:
@@ -21,9 +27,11 @@ spring:
         format_sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
-  logging:
-    level:
-      org.hibernate.SQL: debug
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE  # 파라미터까지 출력됨
 
 google:
     clientId: 226017564204-otrfeo1q0t7gotr7vaemchggh5ts3vb9.apps.googleusercontent.com

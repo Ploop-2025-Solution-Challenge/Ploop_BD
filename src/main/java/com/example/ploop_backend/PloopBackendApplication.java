@@ -6,6 +6,9 @@ import com.example.ploop_backend.domain.user.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.multipart.support.MultipartFilter;
 
 @SpringBootApplication
 public class PloopBackendApplication implements CommandLineRunner {
@@ -22,19 +25,14 @@ public class PloopBackendApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		/*User user = User.builder()
-				.email("test@google.com")
-				.googleId("123456")
-				.name("테스트 유저")
-				.nickname("테유")
-				.age(25)
-				.country("KR")
-				.region("서울")
-				.picture("https://example.com/profile.jpg")
-				.role(Role.USER)
-				.build();*/
+	}
 
-		//userRepository.save(user);
+	@Bean
+	public FilterRegistrationBean<MultipartFilter> multipartFilter() {
+		FilterRegistrationBean<MultipartFilter> registrationBean = new FilterRegistrationBean<>();
+		registrationBean.setFilter(new MultipartFilter());
+		registrationBean.setOrder(0); // ⭐ 가장 먼저 실행되게 설정
+		return registrationBean;
 	}
 }
 
