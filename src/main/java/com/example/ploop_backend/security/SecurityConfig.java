@@ -27,11 +27,13 @@ public class SecurityConfig {
                 .formLogin(login -> login.disable()) // 폼 로그인 비활성화
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/").permitAll()  // ✅ POST / 허용
-                        .requestMatchers("/api/auth/**").permitAll()  // 로그인, 회원가입은 인증 없이 허용
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/auth/google/redirect"
+                        ).permitAll()  // 로그인, 회원가입은 인증 없이 허용
                         .requestMatchers("/api/user/**").hasRole("USER") // USER 권한 필요
                         .anyRequest().authenticated()                // 나머지는 인증 필요
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                );
 
         return http.build();
     }
