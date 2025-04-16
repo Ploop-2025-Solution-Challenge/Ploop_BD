@@ -32,6 +32,7 @@ public class SecurityConfig {
                                 "/auth/google/redirect"
                         ).permitAll()  // 로그인, 회원가입은 인증 없이 허용
                         .requestMatchers("/api/user/**").hasRole("USER") // USER 권한 필요
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()                // 나머지는 인증 필요
                 );
 

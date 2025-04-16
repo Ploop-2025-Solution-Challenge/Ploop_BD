@@ -1,5 +1,7 @@
 # application.yml
 spring:
+  profiles:
+    active: local
   security:
     oauth2:
       client:
@@ -9,7 +11,7 @@ spring:
             client-id: 99898080219-a77mbtbcrdlmt8ssmnl4dicqv58fcr14.apps.googleusercontent.com
             client-secret: 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
   datasource:
-    url: jdbc:mysql://mysql:3307/ploggingdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql:/localhost:3306/ploop_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: plogger
     password: plogger1234
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -28,6 +30,9 @@ spring:
   logging:
     level:
       org.hibernate.SQL: debug
+      org.springframework.security: DEBUG
+      org.springframework.web: DEBUG
+      com.example.ploop_backend: DEBUG
 
 google:
     clientId: 226017564204-otrfeo1q0t7gotr7vaemchggh5ts3vb9.apps.googleusercontent.com
