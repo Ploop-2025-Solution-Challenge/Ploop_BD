@@ -1,4 +1,12 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            redirect-uri: http://localhost:8080/auth/google/redirect
+            client-id: 99898080219-a77mbtbcrdlmt8ssmnl4dicqv58fcr14.apps.googleusercontent.com
+            client-secret: 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
   server:
     tomcat:
       max-swallow-size: -1
@@ -7,8 +15,6 @@ spring:
     username: root
     password: root1234
     driver-class-name: com.mysql.cj.jdbc.Driver
-    profiles:
-      active: local
     hikari:
       connection-timeout: 30000  # 30초까지 대기
       initialization-fail-timeout: -1  # 실패해도 재시도
