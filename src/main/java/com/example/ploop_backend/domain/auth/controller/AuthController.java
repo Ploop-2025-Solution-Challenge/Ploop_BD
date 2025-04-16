@@ -43,6 +43,7 @@ public class AuthController {
     public void googleLogin(
             HttpServletResponse response) throws IOException {
 
+        System.out.println("🔥 [로그] /api/auth/login/google 요청됨");
         String googleAuthUrl = UriComponentsBuilder
                 .fromHttpUrl("https://accounts.google.com/o/oauth2/v2/auth")
                 .queryParam("client_id", googleClientId)
@@ -59,6 +60,7 @@ public class AuthController {
     @GetMapping("/auth/google/redirect")
     public ResponseEntity<JwtResponseDto> googleCallback(@RequestParam("code") String code,
                                                          HttpServletResponse response) {
+
         try {
             Map<String, String> requestBody = new HashMap<>();
             requestBody.put("code", code);

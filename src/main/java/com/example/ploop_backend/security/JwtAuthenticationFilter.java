@@ -26,6 +26,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserRepository userRepository;
 
+    // 필터가 적용되지 않을 URL 설정
+    // /api/auth/** 및 /auth/google/redirect 경로는 필터를 적용하지 않음
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.startsWith("/api/auth") || path.startsWith("/auth/google/redirect");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -34,7 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+            System.out.println("[JwtFilter] Authorization 헤더가 없거나 형식이 잘못됨. 필터 통과");
+            filterChain.doFilter(request, response); // JWT가 없으면 다음 필터로 넘김
             return;
         }
 
@@ -42,9 +51,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Claims claims = jwtService.parseJwtToken(jwt);
         String email = claims.getSubject();
 
+        System.out.println("[JwtFilter] JWT 필터 실행됨 ✅ 토큰: " + jwt);
+        System.out.println("[JwtFilter] 파싱된 사용자 이메일: " + email);
+
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> {
+                        System.out.println("[JwtFilter] ❌ 이메일로 사용자 찾기 실패: " + email);
+                        return new RuntimeException("User not found");
+                    });
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
@@ -53,13 +68,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
 
             authentication.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
-            );
-
+                    new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            System.out.println("[JwtFilter] ✅ 인증 객체 등록 완료: " + user.getEmail());
+        } else {
+            System.out.println("[JwtFilter] ⚠️ 이미 인증되어 있음 또는 이메일 없음");
+        }
+        filterChain.doFilter(request, response);
         }
 
-        filterChain.doFilter(request, response);
     }
-}
+
+
 

@@ -93,5 +93,4 @@ public class AuthService {
         String jwt = jwtService.generateJwtToken(user);
         return new JwtResponseDto(jwt);
     }
-
 }
