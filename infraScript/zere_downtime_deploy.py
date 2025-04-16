@@ -21,6 +21,12 @@ class ServiceManager:
         self.next_name: Optional[str] = None
         self.next_port: Optional[int] = None
 
+    def _docker_login(self) -> None:
+        username = os.getenv("GITHUB_ACTOR")  # GitHub 사용자명
+        token = os.getenv("GITHUB_TOKEN")  # GitHub 토큰
+        if username and token:
+            os.system(f"echo {token} | docker login ghcr.io -u {username} --password-stdin")  # Docker 로그인
+
     # 현재 실행 중인 서비스를 찾는 함수
     def _find_current_service(self) -> None:
         cmd: str = f"ps aux | grep 'socat -t0 TCP-LISTEN:{self.socat_port}' | grep -v grep | awk '{{print $NF}}'"
@@ -75,6 +81,7 @@ class ServiceManager:
 
     # 서비스를 업데이트하는 함수
     def update_service(self) -> None:
+        self._docker_login()
         self._find_current_service()
         self._find_next_service()
 

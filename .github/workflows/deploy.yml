@@ -86,7 +86,9 @@ jobs:
           working-directory: /
           comment: Deploy
           command: |
+            export GITHUB_ACTOR=${{ github.actor }} 
+            export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}  
             mkdir -p /dockerProjects/blog
             curl -o /dockerProjects/blog/zere_downtime_deploy.py https://raw.githubusercontent.com/Ploop-2025-Solution-Challenge/Ploop_BD/main/infraScript/zere_downtime_deploy.py
             chmod +x /dockerProjects/blog/zere_downtime_deploy.py
-            python3 /dockerProjects/blog/zere_downtime_deploy.py
+            python3 /dockerProjects/blog/zere_downtime_deploy.py  
