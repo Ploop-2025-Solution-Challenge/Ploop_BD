@@ -34,8 +34,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/**").hasRole("USER") // USER 권한 필요
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()                // 나머지는 인증 필요
-                );
-
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
