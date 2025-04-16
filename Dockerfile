@@ -1,4 +1,4 @@
 # backend/Dockerfile
 FROM openjdk:17
-COPY build/libs/app.jar app.jar
+COPY build/libs/ploop-backend-0.0.1-SNAPSHOT.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
