@@ -12,7 +12,8 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        System.out.println("홈 컨트롤러 도달함");
+        System.out.println("🔥 [로그] / 요청됨");
+
         return "서버 잘 돌아가고 있어요!";
     }
 }

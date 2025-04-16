@@ -55,9 +55,12 @@ public class TrashBinService {
 
             image.transferTo(new File(filePath));
 
-            return "/" + filePath;
+            return "http://localhost:8080/uploads/bin/" + fileName;
+
         } catch (IOException e) {
             throw new RuntimeException("이미지 저장 실패", e);
+
         }
+        // 정적 리소스 매핑 설정 해야됨?
     }
 }
