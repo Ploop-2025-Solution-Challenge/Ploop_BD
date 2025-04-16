@@ -55,7 +55,6 @@ public class AuthService {
 
         // JWT 발급, 인증 헤더로 사용
         String jwt = jwtService.generateJwtToken(user);
-        // JWT를 JwtResponseDto(응답 DTO)에 담아 클라이언트에 반환
         return new JwtResponseDto(jwt);
     }
 
@@ -64,7 +63,7 @@ public class AuthService {
                 new NetHttpTransport(),
                 JacksonFactory.getDefaultInstance()
         )
-                .setAudience(Collections.singletonList(googleClientId)) // 웹용 Client ID
+                .setAudience(Collections.singletonList(googleClientId))
                 .build();
 
         GoogleIdToken idToken = verifier.verify(idTokenString);
@@ -94,5 +93,4 @@ public class AuthService {
         String jwt = jwtService.generateJwtToken(user);
         return new JwtResponseDto(jwt);
     }
-
 }
