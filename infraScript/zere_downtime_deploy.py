@@ -81,7 +81,7 @@ class ServiceManager:
 
     # 서비스를 업데이트하는 함수
     def update_service(self) -> None:
-        self._docker_login()
+
         self._find_current_service()
         self._find_next_service()
 
