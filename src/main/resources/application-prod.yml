@@ -38,3 +38,7 @@ logging:
     org.springframework.transaction.interceptor: INFO
   site:
     name: "My Site Prod"
+management:
+  endpoint:
+    health:
+      enabled: false
