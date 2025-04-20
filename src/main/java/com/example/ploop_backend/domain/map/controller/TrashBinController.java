@@ -4,7 +4,6 @@ import com.example.ploop_backend.domain.map.entity.TrashBin;
 import com.example.ploop_backend.domain.map.service.TrashBinService;
 import com.example.ploop_backend.domain.user.entity.User;
 import com.example.ploop_backend.dto.map.TrashBinMarkerDto;
-import com.example.ploop_backend.dto.map.TrashBinVisibilityDto;
 import com.example.ploop_backend.global.error.ErrorCode;
 import com.example.ploop_backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,7 @@ public class TrashBinController {
         if (user == null) {
             return ResponseEntity.status(401).body("인증되지 않은 사용자입니다.");
         }
-        System.out.println("🔥🔥🔥🔥🔥🔥 컨트롤러 도달함");
+        System.out.println("🔥🔥🔥🔥🔥 TrashBin 컨트롤러 도달함");
         try {
             TrashBin saved = trashBinService.registerTrashBin(user, image, latitude, longitude);
 
