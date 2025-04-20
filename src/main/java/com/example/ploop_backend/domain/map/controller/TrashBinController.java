@@ -61,6 +61,26 @@ public class TrashBinController {
         return ResponseEntity.ok(result);
     }
 
+    // 현재 위치 기반 (사각형) 지도 범위 내 쓰레기통 조회
+    @GetMapping("/bounds")
+    public ResponseEntity<List<TrashBinMarkerDto>> getBinsWithinBounds(
+            @RequestParam("minLat") double minLat,
+            @RequestParam("maxLat") double maxLat,
+            @RequestParam("minLng") double minLng,
+            @RequestParam("maxLng") double maxLng
+    ) {
+        List<TrashBin> bins = trashBinService.getTrashBinsWithinBounds(minLat, maxLat, minLng, maxLng);
+        List<TrashBinMarkerDto> result = bins.stream()
+                .map(bin -> new TrashBinMarkerDto(
+                        bin.getId(),
+                        bin.getLatitude(),
+                        bin.getLongitude(),
+                        bin.getImageUrl()))
+                .toList();
+
+        return ResponseEntity.ok(result);
+    }
+
 
     // 쓰레기통 삭제 (누구나 가능)
     @DeleteMapping("/{id}")

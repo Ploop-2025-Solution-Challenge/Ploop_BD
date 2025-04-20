@@ -44,9 +44,15 @@ public class TrashBinService {
         return trashBinRepository.save(trashBin); // DB에 저장
     }
 
+    // 쓰레기통 전체 조회 최신순
     public List<TrashBin> getAllTrashBins() {
         return trashBinRepository.findAllByOrderByCreatedAtDesc();
-    } // 쓰레기통 전체 조회 최신순
+    }
+
+    // 사각형 범위 내 쓰레기통만 조회
+    public List<TrashBin> getTrashBinsWithinBounds(double minLat, double maxLat, double minLng, double maxLng) {
+        return trashBinRepository.findByLatitudeBetweenAndLongitudeBetween(minLat, maxLat, minLng, maxLng);
+    }
 
     public void deleteTrashBin(Long id, User user) {
         TrashBin bin = trashBinRepository.findById(id)

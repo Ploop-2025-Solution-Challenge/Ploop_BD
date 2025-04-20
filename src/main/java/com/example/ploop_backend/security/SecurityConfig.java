@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(login -> login.disable()) // 폼 로그인 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/").permitAll()  // ✅ POST / 허용
+                        .requestMatchers(HttpMethod.GET, "/").permitAll()
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/auth/google/redirect"
