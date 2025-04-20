@@ -22,13 +22,24 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    // 프로필 정보 수정
     @PatchMapping("/profile")
     public ResponseEntity<?> updateProfile(
             @AuthenticationPrincipal User user,
             @RequestBody UpdateUserProfileRequest request
     ) {
-        User updatedUser = userService.updateProfile(user, request);
-        return ResponseEntity.ok(updatedUser);
+        if (user == null) {
+            return ResponseEntity.status(401).body("인증되지 않은 사용자입니다.");
+        }
+
+        try {
+            User updatedUser = userService.updateProfile(user, request);
+            return ResponseEntity.ok(updatedUser);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("입력값 오류: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("서버 오류: " + e.getMessage());
+        }
     }
 
 }

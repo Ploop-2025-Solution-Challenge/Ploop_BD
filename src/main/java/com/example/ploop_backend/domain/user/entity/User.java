@@ -1,9 +1,10 @@
 package com.example.ploop_backend.domain.user.entity;
 
-import com.example.ploop_backend.domain.user.model.Gender;
-import com.example.ploop_backend.domain.user.model.Role;
+import com.example.ploop_backend.domain.user.model.*;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -40,5 +41,16 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    private Difficulty difficulty;
+
+    @Enumerated(EnumType.STRING)
+    private Motivation motivation;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_location_preferences", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "preference")
+    private List<PreferredArea> preferredArea;
 }
 

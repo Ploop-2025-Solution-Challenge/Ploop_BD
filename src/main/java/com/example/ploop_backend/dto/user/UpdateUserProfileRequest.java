@@ -1,13 +1,19 @@
 package com.example.ploop_backend.dto.user;
 
-import com.example.ploop_backend.domain.user.model.Gender;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 public class UpdateUserProfileRequest {
     private String nickname;
     private Integer age;
+    private String gender; //// Gender enum이 아닌, 프론트에서 보내는 문자열 그대로 받음
     private String country;
     private String region;
-    private Gender gender;
+
+    private String difficulty;
+    private String motivation;
+
+    private List<String> preferredArea;
 }

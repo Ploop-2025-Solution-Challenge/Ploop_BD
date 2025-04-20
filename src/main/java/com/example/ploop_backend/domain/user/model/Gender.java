@@ -1,7 +1,26 @@
 package com.example.ploop_backend.domain.user.model;
 
-public enum Gender{
-    MALE, //남
-    FEMALE, //여
-    UNKNOWN //모름
+import java.util.Arrays;
+
+public enum Gender {
+    FEMALE("Female"),
+    MALE("Male"),
+    NOT_SPECIFIED("Prefer not to say");
+
+    private final String label;
+
+    Gender(String label) {
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public static Gender fromLabel(String label) {
+        return Arrays.stream(Gender.values())
+                .filter(g -> g.label.equalsIgnoreCase(label))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unknown gender: " + label));
+    }
 }
