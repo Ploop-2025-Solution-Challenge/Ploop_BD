@@ -5,6 +5,8 @@ import com.example.ploop_backend.domain.map.service.TrashBinService;
 import com.example.ploop_backend.domain.user.entity.User;
 import com.example.ploop_backend.dto.map.TrashBinMarkerDto;
 import com.example.ploop_backend.dto.map.TrashBinVisibilityDto;
+import com.example.ploop_backend.global.error.ErrorCode;
+import com.example.ploop_backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +37,13 @@ public class TrashBinController {
             return ResponseEntity.status(401).body("인증되지 않은 사용자입니다.");
         }
         System.out.println("🔥🔥🔥🔥🔥🔥 컨트롤러 도달함");
-        TrashBin saved = trashBinService.registerTrashBin(user, image, latitude, longitude);
-        return ResponseEntity.ok(saved);
+        try {
+            TrashBin saved = trashBinService.registerTrashBin(user, image, latitude, longitude);
+
+            return ResponseEntity.ok(saved);
+        } catch (IOException e) {
+            throw new CustomException(ErrorCode.DATABASE_ERROR);
+        }
     }
 
     // 쓰레기통 마커 전체 조회 DTO 변환

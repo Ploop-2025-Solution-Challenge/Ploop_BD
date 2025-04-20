@@ -1,19 +1,19 @@
 spring:
+  profiles:
+    active: secret
+  server:
+    tomcat:
+      max-swallow-size: -1
   security:
     oauth2:
       client:
         registration:
           google:
             redirect-uri: http://localhost:8080/auth/google/redirect
-            client-id: 99898080219-a77mbtbcrdlmt8ssmnl4dicqv58fcr14.apps.googleusercontent.com
-            client-secret: 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
-  server:
-    tomcat:
-      max-swallow-size: -1
   datasource:
-    url: jdbc:mysql://localhost:3306/ploop_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/ploop
     username: root
-    password: root1234
+    password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       connection-timeout: 30000  # 30초까지 대기
@@ -26,7 +26,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update   # 개발 중엔 update, 운영 땐 validate
+      ddl-auto: create # 개발 중에는 db 구조 변경이 잦으므로 create로 설정
     show-sql: true
     properties:
       hibernate:
@@ -38,9 +38,5 @@ logging:
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql: TRACE  # 파라미터까지 출력됨
-
-google:
-    clientId: 226017564204-otrfeo1q0t7gotr7vaemchggh5ts3vb9.apps.googleusercontent.com
-
 jwt:
   secret: bXktc3VwZXItc2VjdXJlLXNlY3JldC1rZXktZm9yLXRva2VuIQ==

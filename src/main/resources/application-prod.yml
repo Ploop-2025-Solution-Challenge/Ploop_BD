@@ -1,0 +1,44 @@
+server:
+  shutdown: graceful
+spring:
+  config:
+    import: "application-secret.yml"
+  autoconfigure:
+    exclude:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            redirect-uri: https://api.ploop.store/auth/google/redirect
+  lifecycle:
+    timeout-per-shutdown-phase: 1h
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://172.17.0.1:3306/ploop
+    username: root
+  data:
+    redis:
+      host: 172.17.0.1
+      port: 6379
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
+        highlight_sql: false
+        use_sql_comments: false
+logging:
+  level:
+    com.ll.demo03: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.orm.jdbc.bind: INFO
+    org.hibernate.orm.jdbc.extract: INFO
+    org.springframework.transaction.interceptor: INFO
+  site:
+    name: "My Site Prod"
+management:
+  endpoint:
+    health:
+      enabled: false
