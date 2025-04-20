@@ -31,9 +31,9 @@ public class TrashBinService {
     private final TrashBinRepository trashBinRepository;
 
     public TrashBin registerTrashBin(User user, MultipartFile image, double lat, double lng) throws IOException {
-        String imagePath = saveImageToCloud(image);
+        String imagePath = saveImageToCloud(image); // 이미지 R2에 업로드
 
-        TrashBin trashBin = TrashBin.builder()
+        TrashBin trashBin = TrashBin.builder() // URL, 위치, 사용자 정보를 쓰레기통 객체에 저장
                 .createdBy(user)
                 .latitude(lat)
                 .longitude(lng)
@@ -41,40 +41,21 @@ public class TrashBinService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return trashBinRepository.save(trashBin);
+        return trashBinRepository.save(trashBin); // DB에 저장
     }
 
     public List<TrashBin> getAllTrashBins() {
         return trashBinRepository.findAllByOrderByCreatedAtDesc();
-    }
+    } // 쓰레기통 전체 조회 최신순
 
     public void deleteTrashBin(Long id, User user) {
         TrashBin bin = trashBinRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 쓰레기통입니다."));
+
         trashBinRepository.delete(bin);
     }
 
-    // 로컬 저장 (나중에 Cloud Storage로 확장)
-    private String saveImage(MultipartFile image) {
-        try {
-            String folder = "uploads/bin/";
-            File dir = new File(folder);
-            if (!dir.exists()) dir.mkdirs();
-
-            String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
-            String filePath = folder + fileName;
-
-            image.transferTo(new File(filePath));
-
-            return "http://localhost:8080/uploads/bin/" + fileName;
-
-        } catch (IOException e) {
-            throw new RuntimeException("이미지 저장 실패", e);
-
-        }
-        // 정적 리소스 매핑 설정 해야됨?
-    }
-
+    // 업로드된 이미지 R2에 저장 -> URL 반환
     public String saveImageToCloud(MultipartFile file) throws IOException {
         String originalFilename = file.getOriginalFilename();
         String extension = "";

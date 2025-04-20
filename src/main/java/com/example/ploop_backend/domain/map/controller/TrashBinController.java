@@ -64,7 +64,7 @@ public class TrashBinController {
 
     // 쓰레기통 삭제 (누구나 가능)
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBin(@PathVariable Long id) {
+    public ResponseEntity<?> deleteBin(@PathVariable("id") Long id) {
         trashBinService.deleteTrashBin(id, null);
         //return ResponseEntity.ok().build();
         return ResponseEntity.ok(
