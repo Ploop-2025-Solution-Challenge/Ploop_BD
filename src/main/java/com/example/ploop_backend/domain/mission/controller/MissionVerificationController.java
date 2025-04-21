@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// 미션 인증 결과를 AI가 판단하기 위한 API
 @RestController
 @RequestMapping("/api/mission-verification")
 @RequiredArgsConstructor
