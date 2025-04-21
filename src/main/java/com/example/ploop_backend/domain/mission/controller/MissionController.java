@@ -6,6 +6,7 @@ import com.example.ploop_backend.domain.mission.entity.UserMission;
 import com.example.ploop_backend.domain.mission.repository.UserMissionRepository;
 import com.example.ploop_backend.domain.mission.service.ImageUploadService;
 import com.example.ploop_backend.domain.mission.service.MissionVerificationService;
+import com.example.ploop_backend.domain.team.entity.Team;
 import com.example.ploop_backend.domain.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user/missions")
@@ -28,13 +30,28 @@ public class MissionController {
     private final MissionVerificationService missionVerificationService;
 
     // 유저의 전체 미션 조회 (3개)
+    // 유저의 전체 미션 조회 (프론트 요건에 맞게 응답 형태 변경)
     @GetMapping
-    public ResponseEntity<List<UserMissionResponseDto>> getMyMissions(@AuthenticationPrincipal User user) {
+    public ResponseEntity<Map<String, Object>> getMyMissions(@AuthenticationPrincipal User user) {
         List<UserMission> missions = userMissionRepository.findAllByUser(user);
         List<UserMissionResponseDto> result = missions.stream()
                 .map(UserMissionResponseDto::from)
-                .toList();
-        return ResponseEntity.ok(result);
+                .collect(Collectors.toList());
+        Team team = missions.isEmpty() ? null : missions.get(0).getTeamMission().getTeam();
+        String partnerNickname = null;
+        Long teamId = null;
+
+        if (team != null) {
+            teamId = team.getId();
+            User partner = team.getUser1().getId().equals(user.getId()) ? team.getUser2() : team.getUser1();
+            partnerNickname = partner.getNickname();
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "teamId", teamId,
+                "partnerName", partnerNickname,
+                "missions", result
+        ));
     }
 
     // 특정 미션 상세 조회

@@ -17,6 +17,9 @@ public class TeamMatchService {
 
     @Transactional
     public Team createTeam(Long user1Id, Long user2Id, String week) {
+        validateUserNotAlreadyInTeam(user1Id, week);
+        validateUserNotAlreadyInTeam(user2Id, week);
+
         User user1 = userRepository.findById(user1Id).orElseThrow();
         User user2 = userRepository.findById(user2Id).orElseThrow();
 
@@ -27,6 +30,14 @@ public class TeamMatchService {
                 .build();
 
         return teamRepository.save(team);
+    }
+
+    public void validateUserNotAlreadyInTeam(Long userId, String week) {
+        boolean exists = teamRepository.existsByUser1_IdAndWeek(userId, week)
+                || teamRepository.existsByUser2_IdAndWeek(userId, week);
+        if (exists) {
+            throw new IllegalArgumentException("해당 유저는 이미 이번 주 팀에 소속되어 있습니다.");
+        }
     }
 }
 

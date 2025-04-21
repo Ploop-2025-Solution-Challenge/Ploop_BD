@@ -14,7 +14,6 @@ public class UserMissionResponseDto {
     private Long userMissionId;
     private MissionDto mission;
     private boolean completed;
-    private float progress;
 
     public static UserMissionResponseDto from(UserMission um) {
         return UserMissionResponseDto.builder()
