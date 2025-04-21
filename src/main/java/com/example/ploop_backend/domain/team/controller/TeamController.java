@@ -37,7 +37,7 @@ public class TeamController {
 
     // 팀별 미션 조회
     @GetMapping("/{teamId}/missions")
-    public ResponseEntity<List<TeamMissionDto>> getMissionsByTeam(@PathVariable Long teamId) {
+    public ResponseEntity<List<TeamMissionDto>> getMissionsByTeam(@PathVariable(name = "teamId") Long teamId) {
         List<TeamMission> missions = teamMissionRepository.findAllByTeamId(teamId);
         List<TeamMissionDto> result = missions.stream()
                 .map(TeamMissionDto::from)

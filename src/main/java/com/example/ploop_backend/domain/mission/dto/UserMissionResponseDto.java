@@ -31,6 +31,9 @@ public class UserMissionResponseDto {
         private String description;
 
         public static MissionDto from(Mission mission) {
+            if (mission == null) {
+                return null;
+            }
             return MissionDto.builder()
                     .name(mission.getName())
                     .description(mission.getDescription())

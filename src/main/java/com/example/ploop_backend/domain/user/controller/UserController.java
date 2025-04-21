@@ -42,5 +42,11 @@ public class UserController {
         }
     }
 
+    @DeleteMapping("/me")
+    public ResponseEntity<String> deleteMyAccount(@AuthenticationPrincipal User currentUser) {
+        userService.deleteUser(currentUser);
+        return ResponseEntity.ok("회원 정보가 삭제되었습니다.");
+    }
+
 }
 

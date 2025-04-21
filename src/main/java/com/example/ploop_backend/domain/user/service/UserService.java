@@ -9,6 +9,7 @@ import com.example.ploop_backend.dto.user.UpdateUserProfileRequest;
 import com.example.ploop_backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,5 +39,10 @@ public class UserService {
         user.setPreferredArea(preferredArea); // 추가된 필드
 
         return userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(User user) {
+        userRepository.delete(user);
     }
 }

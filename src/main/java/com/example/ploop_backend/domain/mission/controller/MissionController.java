@@ -56,7 +56,7 @@ public class MissionController {
 
     // 특정 미션 상세 조회
     @GetMapping("/{userMissionId}")
-    public ResponseEntity<UserMission> getMissionDetail(@PathVariable Long userMissionId) {
+    public ResponseEntity<UserMission> getMissionDetail(@PathVariable("userMissionId") Long userMissionId) {
         UserMission mission = userMissionRepository.findById(userMissionId).orElseThrow();
         return ResponseEntity.ok(mission);
     }
