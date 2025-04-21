@@ -11,7 +11,7 @@ spring:
           google:
             redirect-uri: http://localhost:8080/auth/google/redirect
   datasource:
-    url: jdbc:mysql://localhost:3306/ploop # ploop_db
+    url: jdbc:mysql://localhost:3306/ploop_db # ploop_db
     username: root # plogger
     password: 1234 # plogger1234
     driver-class-name: com.mysql.cj.jdbc.Driver
