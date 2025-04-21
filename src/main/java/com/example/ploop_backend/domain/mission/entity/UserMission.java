@@ -4,12 +4,15 @@ import com.example.ploop_backend.domain.team.entity.TeamMission;
 import com.example.ploop_backend.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class UserMission {
 
     @Id
@@ -26,5 +29,6 @@ public class UserMission {
 
     private Boolean completed = false;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @CreatedDate
+    private LocalDateTime createdAt;
 }

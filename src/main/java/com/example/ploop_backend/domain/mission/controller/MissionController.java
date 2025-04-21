@@ -1,5 +1,7 @@
 package com.example.ploop_backend.domain.mission.controller;
 
+import com.example.ploop_backend.domain.mission.dto.MissionSimpleDto;
+import com.example.ploop_backend.domain.mission.dto.MissionSummaryResponseDto;
 import com.example.ploop_backend.domain.mission.dto.UserMissionResponseDto;
 import com.example.ploop_backend.domain.mission.entity.MissionVerification;
 import com.example.ploop_backend.domain.mission.entity.UserMission;
@@ -54,12 +56,15 @@ public class MissionController {
         ));
     }
 
-    // 특정 미션 상세 조회
+    // 유저의 특정 미션 조회
     @GetMapping("/{userMissionId}")
-    public ResponseEntity<UserMission> getMissionDetail(@PathVariable("userMissionId") Long userMissionId) {
+    public ResponseEntity<UserMissionResponseDto> getMissionDetail(@PathVariable("userMissionId") Long userMissionId) {
         UserMission mission = userMissionRepository.findById(userMissionId).orElseThrow();
-        return ResponseEntity.ok(mission);
+
+        UserMissionResponseDto dto = UserMissionResponseDto.from(mission);
+        return ResponseEntity.ok(dto);
     }
+
 
     // 인증 사진 제출 (AI가 판단할 사진 제출)
     @PostMapping("/{userMissionId}/verify")
@@ -84,6 +89,48 @@ public class MissionController {
                     "detail", e.getMessage()
             ));
         }
+    }
+
+    // 미션 요약 조회: 파트너, 파트너 미션, 내 이번 주 미션 포함
+    @GetMapping("/summary")
+    public ResponseEntity<?> getMissionSummary(@AuthenticationPrincipal User user) {
+        List<UserMission> myMissions = userMissionRepository.findAllByUser(user);
+        if (myMissions.isEmpty()) {
+            return ResponseEntity.ok(Map.of(
+                    "message", "아직 미션이 없습니다."
+            ));
+        }
+
+        Team team = myMissions.get(0).getTeamMission().getTeam();
+        User partner = team.getUser1().getId().equals(user.getId()) ? team.getUser2() : team.getUser1();
+
+        List<UserMission> partnerMissions = userMissionRepository.findAllByUser(partner);
+        List<MissionSimpleDto> partnerMissionDtos = partnerMissions.stream()
+                .filter(m -> m.getTeamMission() != null && m.getTeamMission().getMission() != null)
+                .map(m -> MissionSimpleDto.builder()
+                        .name(m.getTeamMission().getMission().getName())
+                        .completed(Boolean.TRUE.equals(m.getCompleted()))
+                        .build()
+                )
+                .toList();
+
+        // 내 이번 주 미션 (가장 최근 기준, createdAt 정렬)
+        UserMission recentMission = myMissions.stream()
+                .filter(m -> m.getTeamMission() != null && m.getTeamMission().getMission() != null)
+                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+                .findFirst()
+                .orElse(null);
+
+        MissionSimpleDto myCurrent = recentMission == null ? null : MissionSimpleDto.builder()
+                .name(recentMission.getTeamMission().getMission().getName())
+                .completed(Boolean.TRUE.equals(recentMission.getCompleted()))
+                .build();
+
+        return ResponseEntity.ok(MissionSummaryResponseDto.builder()
+                .partnerName(partner.getNickname())
+                .partnerMissions(partnerMissionDtos)
+                .myCurrentMission(myCurrent)
+                .build());
     }
 
 }
