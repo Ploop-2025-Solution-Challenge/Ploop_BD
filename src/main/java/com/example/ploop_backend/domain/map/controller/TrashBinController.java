@@ -4,7 +4,6 @@ import com.example.ploop_backend.domain.map.entity.TrashBin;
 import com.example.ploop_backend.domain.map.service.TrashBinService;
 import com.example.ploop_backend.domain.user.entity.User;
 import com.example.ploop_backend.dto.map.TrashBinMarkerDto;
-import com.example.ploop_backend.dto.map.TrashBinVisibilityDto;
 import com.example.ploop_backend.global.error.ErrorCode;
 import com.example.ploop_backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,7 @@ public class TrashBinController {
         if (user == null) {
             return ResponseEntity.status(401).body("인증되지 않은 사용자입니다.");
         }
-        System.out.println("🔥🔥🔥🔥🔥🔥 컨트롤러 도달함");
+        System.out.println("🔥🔥🔥🔥🔥 TrashBin 컨트롤러 도달함");
         try {
             TrashBin saved = trashBinService.registerTrashBin(user, image, latitude, longitude);
 
@@ -61,10 +60,30 @@ public class TrashBinController {
         return ResponseEntity.ok(result);
     }
 
+    // 현재 위치 기반 (사각형) 지도 범위 내 쓰레기통 조회
+    @GetMapping("/bounds")
+    public ResponseEntity<List<TrashBinMarkerDto>> getBinsWithinBounds(
+            @RequestParam("minLat") double minLat,
+            @RequestParam("maxLat") double maxLat,
+            @RequestParam("minLng") double minLng,
+            @RequestParam("maxLng") double maxLng
+    ) {
+        List<TrashBin> bins = trashBinService.getTrashBinsWithinBounds(minLat, maxLat, minLng, maxLng);
+        List<TrashBinMarkerDto> result = bins.stream()
+                .map(bin -> new TrashBinMarkerDto(
+                        bin.getId(),
+                        bin.getLatitude(),
+                        bin.getLongitude(),
+                        bin.getImageUrl()))
+                .toList();
+
+        return ResponseEntity.ok(result);
+    }
+
 
     // 쓰레기통 삭제 (누구나 가능)
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBin(@PathVariable Long id) {
+    public ResponseEntity<?> deleteBin(@PathVariable("id") Long id) {
         trashBinService.deleteTrashBin(id, null);
         //return ResponseEntity.ok().build();
         return ResponseEntity.ok(
