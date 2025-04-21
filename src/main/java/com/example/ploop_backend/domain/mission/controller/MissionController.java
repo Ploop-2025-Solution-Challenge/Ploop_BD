@@ -1,10 +1,11 @@
-// 📁 MissionController.java
 package com.example.ploop_backend.domain.mission.controller;
 
 import com.example.ploop_backend.domain.mission.dto.UserMissionResponseDto;
+import com.example.ploop_backend.domain.mission.entity.MissionVerification;
 import com.example.ploop_backend.domain.mission.entity.UserMission;
 import com.example.ploop_backend.domain.mission.repository.UserMissionRepository;
 import com.example.ploop_backend.domain.mission.service.ImageUploadService;
+import com.example.ploop_backend.domain.mission.service.MissionVerificationService;
 import com.example.ploop_backend.domain.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class MissionController {
 
     private final UserMissionRepository userMissionRepository;
     private final ImageUploadService imageUploadService;
+    private final MissionVerificationService missionVerificationService;
 
     // 유저의 전체 미션 조회 (3개)
     @GetMapping
@@ -50,11 +52,14 @@ public class MissionController {
     ) {
         try {
             String imageUrl = imageUploadService.saveImageToCloud(image);
+            MissionVerification verification = missionVerificationService.createVerification(userMissionId, imageUrl);
+
             return ResponseEntity.ok(Map.of(
                     "userMissionId", userMissionId,
                     "status", "PENDING",
                     "imageUrl", imageUrl,
-                    "message", "사진이 업로드되었습니다."
+                    "verificationId", verification.getId(),
+                    "message", "사진이 업로드되었고, 인증이 대기 중입니다."
             ));
         } catch (IOException e) {
             return ResponseEntity.status(500).body(Map.of(

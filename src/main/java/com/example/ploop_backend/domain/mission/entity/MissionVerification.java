@@ -16,6 +16,7 @@ public class MissionVerification {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_mission_id")
+
     private UserMission userMission;
 
     private String imageUrl;

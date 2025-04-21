@@ -7,9 +7,7 @@ import com.example.ploop_backend.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-
 import java.util.List;
-
 
 @Service
 @RequiredArgsConstructor
