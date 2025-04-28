@@ -17,8 +17,8 @@ public class TrashSpot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long latitude;
-    private Long longitude;
+    private double latitude;
+    private double longitude;
 
     private String imageUrl;
 
