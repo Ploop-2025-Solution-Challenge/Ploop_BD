@@ -8,15 +8,14 @@ from fastapi import FastAPI, File, UploadFile, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
-from ultralytics import YOLO
 import cv2
 import os
 import tempfile
-import shutil
 import base64
+from matcher import process_new_user, init_pinecone, get_mysql_connection, setup_scheduler
+from detector import detect_trash
+import threading
 
-# YOLO 모델 로드
-model = YOLO("YOLOv11_trash/train13/weights/best.pt")
 
 # FastAPI 앱 생성
 app = FastAPI(title="쓰레기 감지 API", description="YOLO 모델을 사용한 쓰레기 객체 감지 API")
@@ -38,48 +37,22 @@ os.makedirs(RESULTS_DIR, exist_ok=True)
 class ImageUrlRequest(BaseModel):
     image_url: str
 
-# 객체 감지 함수
-def detect_trash(image):
-    # 객체 감지 실행
-    results = model(image)
+# Pydantic 모델 정의
+class NewUserRequest(BaseModel):
+    user_id: int
 
-    # 결과를 저장할 JSON 구조 초기화
-    json_result = {
-        "total_detections": 0,
-        "objects": []
-    }
+# 애플리케이션 시작 시 스케줄러 실행
+@app.on_event("startup")
+async def startup_event():
+    # Pinecone 초기화
+    init_pinecone()
 
-    for result in results:
-        # 박스 정보 가져오기
-        boxes = result.boxes
-        # 검출된 객체 수
-        num_detections = len(boxes)
-        json_result["total_detections"] += num_detections
+    # 스케줄러를 별도 스레드로 실행
+    scheduler_thread = threading.Thread(target=setup_scheduler)
+    scheduler_thread.daemon = True
+    scheduler_thread.start()
 
-        # 각 검출 객체에 대한 정보 기록
-        for box, cls, conf in zip(boxes.xyxy, boxes.cls, boxes.conf):
-            x1, y1, x2, y2 = box.tolist()
-            class_id = int(cls.item())
-            class_name = result.names[class_id]
-            confidence = conf.item()
 
-            # 객체 정보 저장
-            detection_info = {
-                "class": class_name,
-                "confidence": float(confidence),
-                "bbox": {
-                    "x1": float(x1),
-                    "y1": float(y1),
-                    "x2": float(x2),
-                    "y2": float(y2)
-                }
-            }
-            json_result["objects"].append(detection_info)
-
-    # 시각화 이미지 생성
-    result_plot = results[0].plot()
-
-    return json_result, result_plot, results
 
 @app.post("/detect/upload")
 async def detect_from_upload(file: UploadFile = File(...)):
@@ -121,6 +94,22 @@ async def detect_from_upload(file: UploadFile = File(...)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"객체 감지 중 오류 발생: {str(e)}")
+
+
+
+@app.post("/api/new_user")
+async def handle_new_user(request: NewUserRequest):
+    if not request.user_id:
+        raise HTTPException(status_code=400, detail="user_id required")
+
+    try:
+        mysql_conn = get_mysql_connection()
+        pinecone_idx = init_pinecone()
+        process_new_user(request.user_id, mysql_conn, pinecone_idx)
+        mysql_conn.close()
+        return {"status": "success", "message": "User processed successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/")
 async def root():
