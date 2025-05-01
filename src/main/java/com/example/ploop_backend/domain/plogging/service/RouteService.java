@@ -4,6 +4,7 @@ import com.example.ploop_backend.domain.plogging.entity.Route;
 import com.example.ploop_backend.dto.plogging.RouteRequestDto;
 import com.example.ploop_backend.domain.plogging.repository.RouteRepository;
 import com.example.ploop_backend.dto.plogging.RouteResponseDto;
+import com.example.ploop_backend.dto.plogging.RouteSummaryDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -58,4 +59,41 @@ public class RouteService {
                 .trashCollectedCount(route.getTrashCollectedCount())
                 .build();
     }
+
+    public List<RouteSummaryDto> getRoutesByUserId(String userId) {
+        List<Route> routes = routeRepository.findAllByUserId(userId);
+
+        return routes.stream()
+                .map(route -> RouteSummaryDto.builder()
+                        .routeId(route.getId())
+                        .timeDuration(route.getTimeDuration())
+                        .updatedDateTime(route.getUpdatedDateTime().toString())
+                        .distanceMiles(route.getDistanceMiles())
+                        .trashCollectedCount(route.getTrashCollectedCount())
+                        .build())
+                .toList();
+    }
+
+    public void delete(Long routeId) {
+        if (!routeRepository.existsById(routeId)) {
+            throw new IllegalArgumentException("해당 routeId가 존재하지 않습니다.");
+        }
+        routeRepository.deleteById(routeId);
+    }
+
+    public List<RouteSummaryDto> getAllRoutes() {
+        List<Route> routes = routeRepository.findAll();
+
+        return routes.stream()
+                .map(route -> RouteSummaryDto.builder()
+                        .routeId(route.getId())
+                        .userId(route.getUserId())
+                        .timeDuration(route.getTimeDuration())
+                        .updatedDateTime(route.getUpdatedDateTime().toString())
+                        .distanceMiles(route.getDistanceMiles())
+                        .trashCollectedCount(route.getTrashCollectedCount())
+                        .build())
+                .toList();
+    }
+
 }
