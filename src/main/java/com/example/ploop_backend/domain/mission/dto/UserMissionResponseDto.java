@@ -19,7 +19,7 @@ public class UserMissionResponseDto {
         return UserMissionResponseDto.builder()
                 .userMissionId(um.getId())
                 .mission(MissionDto.from(um.getTeamMission().getMission()))
-                .completed(Boolean.TRUE.equals(um.getCompleted()))
+                .completed(Boolean.TRUE.equals(um.getIsVerified()))
                 .build();
     }
 

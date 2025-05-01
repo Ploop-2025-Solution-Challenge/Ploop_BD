@@ -43,7 +43,7 @@ public class MissionVerificationService {
 
         if (isVerified) {
             UserMission um = verification.getUserMission();
-            um.setCompleted(true);
+            um.setIsVerified(true);
             userMissionRepository.save(um);
         }
     }

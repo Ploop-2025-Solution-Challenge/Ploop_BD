@@ -112,7 +112,7 @@ public class MissionController {
                 .filter(m -> m.getTeamMission() != null && m.getTeamMission().getMission() != null)
                 .map(m -> MissionSimpleDto.builder()
                         .name(m.getTeamMission().getMission().getName())
-                        .completed(Boolean.TRUE.equals(m.getCompleted()))
+                        .completed(Boolean.TRUE.equals(m.getIsVerified()))
                         .build()
                 )
                 .toList();
@@ -122,7 +122,7 @@ public class MissionController {
                 .filter(m -> m.getTeamMission() != null && m.getTeamMission().getMission() != null)
                 .map(m -> MissionSimpleDto.builder()
                         .name(m.getTeamMission().getMission().getName())
-                        .completed(Boolean.TRUE.equals(m.getCompleted()))
+                        .completed(Boolean.TRUE.equals(m.getIsVerified()))
                         .build()
                 )
                 .toList();

@@ -27,7 +27,7 @@ public class UserMission {
     @JoinColumn(name = "team_mission_id")
     private TeamMission teamMission;
 
-    private Boolean completed = false;
+    private Boolean isVerified = false;
 
     @CreatedDate
     private LocalDateTime createdAt;
