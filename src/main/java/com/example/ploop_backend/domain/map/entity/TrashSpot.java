@@ -22,9 +22,9 @@ public class TrashSpot {
 
     private String imageUrl;
 
-    private LocalDateTime createdAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    private User reportedBy;
+    private User reportedBy; // 쓰레기 구역을 신고한 유저
+
+    private LocalDateTime createdAt;
 }
 

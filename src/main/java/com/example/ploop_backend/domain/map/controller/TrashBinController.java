@@ -3,7 +3,8 @@ package com.example.ploop_backend.domain.map.controller;
 import com.example.ploop_backend.domain.map.entity.TrashBin;
 import com.example.ploop_backend.domain.map.service.TrashBinService;
 import com.example.ploop_backend.domain.user.entity.User;
-import com.example.ploop_backend.dto.map.TrashBinMarkerDto;
+import com.example.ploop_backend.dto.map.TrashBinDto;
+import com.example.ploop_backend.dto.map.TrashSpotDto;
 import com.example.ploop_backend.global.error.ErrorCode;
 import com.example.ploop_backend.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -47,14 +48,10 @@ public class TrashBinController {
 
     // 쓰레기통 마커 전체 조회 DTO 변환
     @GetMapping
-    public ResponseEntity<List<TrashBinMarkerDto>> getAllBins() {
+    public ResponseEntity<List<TrashBinDto>> getAllBins() {
         List<TrashBin> bins = trashBinService.getAllTrashBins();
-        List<TrashBinMarkerDto> result = bins.stream()
-                .map(bin -> new TrashBinMarkerDto(
-                        bin.getId(),
-                        bin.getLatitude(),
-                        bin.getLongitude(),
-                        bin.getImageUrl()))
+        List<TrashBinDto> result = bins.stream()
+                .map(TrashBinDto::from)   // record에서 변환 메서드 사용
                 .toList();
 
         return ResponseEntity.ok(result);
@@ -62,19 +59,15 @@ public class TrashBinController {
 
     // 현재 위치 기반 (사각형) 지도 범위 내 쓰레기통 조회
     @GetMapping("/bounds")
-    public ResponseEntity<List<TrashBinMarkerDto>> getBinsWithinBounds(
+    public ResponseEntity<List<TrashBinDto>> getBinsWithinBounds(
             @RequestParam("minLat") double minLat,
             @RequestParam("maxLat") double maxLat,
             @RequestParam("minLng") double minLng,
             @RequestParam("maxLng") double maxLng
     ) {
         List<TrashBin> bins = trashBinService.getTrashBinsWithinBounds(minLat, maxLat, minLng, maxLng);
-        List<TrashBinMarkerDto> result = bins.stream()
-                .map(bin -> new TrashBinMarkerDto(
-                        bin.getId(),
-                        bin.getLatitude(),
-                        bin.getLongitude(),
-                        bin.getImageUrl()))
+        List<TrashBinDto> result = bins.stream()
+                .map(TrashBinDto::from)
                 .toList();
 
         return ResponseEntity.ok(result);

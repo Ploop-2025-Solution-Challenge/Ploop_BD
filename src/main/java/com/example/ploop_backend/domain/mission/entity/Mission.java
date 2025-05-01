@@ -7,7 +7,9 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor @AllArgsConstructor @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Mission {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
