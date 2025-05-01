@@ -12,5 +12,5 @@ import java.util.List;
 public class MissionSummaryResponseDto {
     private String partnerName;
     private List<MissionSimpleDto> partnerMissions;
-    private MissionSimpleDto myCurrentMission;
+    private List<MissionSimpleDto> myMissions;
 }

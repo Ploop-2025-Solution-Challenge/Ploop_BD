@@ -104,7 +104,10 @@ public class MissionController {
         Team team = myMissions.get(0).getTeamMission().getTeam();
         User partner = team.getUser1().getId().equals(user.getId()) ? team.getUser2() : team.getUser1();
 
+        // 파트너 미션
         List<UserMission> partnerMissions = userMissionRepository.findAllByUser(partner);
+
+        // 파트너 미션 DTO 리스트
         List<MissionSimpleDto> partnerMissionDtos = partnerMissions.stream()
                 .filter(m -> m.getTeamMission() != null && m.getTeamMission().getMission() != null)
                 .map(m -> MissionSimpleDto.builder()
@@ -114,22 +117,21 @@ public class MissionController {
                 )
                 .toList();
 
-        // 내 이번 주 미션 (가장 최근 기준, createdAt 정렬)
-        UserMission recentMission = myMissions.stream()
+        // 내 미션 DTO 리스트
+        List<MissionSimpleDto> myMissionsDtos = myMissions.stream()
                 .filter(m -> m.getTeamMission() != null && m.getTeamMission().getMission() != null)
-                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
-                .findFirst()
-                .orElse(null);
+                .map(m -> MissionSimpleDto.builder()
+                        .name(m.getTeamMission().getMission().getName())
+                        .completed(Boolean.TRUE.equals(m.getCompleted()))
+                        .build()
+                )
+                .toList();
 
-        MissionSimpleDto myCurrent = recentMission == null ? null : MissionSimpleDto.builder()
-                .name(recentMission.getTeamMission().getMission().getName())
-                .completed(Boolean.TRUE.equals(recentMission.getCompleted()))
-                .build();
 
         return ResponseEntity.ok(MissionSummaryResponseDto.builder()
                 .partnerName(partner.getNickname())
                 .partnerMissions(partnerMissionDtos)
-                .myCurrentMission(myCurrent)
+                .myMissions(myMissionsDtos)
                 .build());
     }
 
