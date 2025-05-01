@@ -14,5 +14,6 @@ public class RouteRequestDto {
     private List<List<Double>> activityRoute;
     private String timeDuration;
     private String updatedDateTime;
+    private Double distanceMiles;
     private Integer trashCollectedCount;
 }

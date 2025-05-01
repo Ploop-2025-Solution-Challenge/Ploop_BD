@@ -30,6 +30,6 @@ public class Route {
 
     private Integer trashCollectedCount;
 
-    @Column(columnDefinition = "jsonb")
+    @Column(columnDefinition = "json")
     private String activityRouteJson; // JSON으로 직렬화된 좌표 리스트
 }
