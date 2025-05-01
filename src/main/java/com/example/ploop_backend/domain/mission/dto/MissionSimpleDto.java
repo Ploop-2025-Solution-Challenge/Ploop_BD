@@ -9,5 +9,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class MissionSimpleDto {
     private String name;
-    private boolean completed;
+    private boolean isVerified;
 }

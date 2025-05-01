@@ -21,7 +21,7 @@ public class MissionVerificationDto {
         return MissionVerificationDto.builder()
                 .id(entity.getId())
                 .imageUrl(entity.getImageUrl())
-                .verified(entity.getVerified())
+                .verified(entity.getIsVerified())
                 .submittedAt(entity.getSubmittedAt())
                 .verifiedAt(entity.getVerifiedAt())
                 .build();

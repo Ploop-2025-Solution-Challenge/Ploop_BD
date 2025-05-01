@@ -21,7 +21,7 @@ public class MissionVerification {
 
     private String imageUrl;
 
-    private Boolean verified;
+    private Boolean isVerified;
 
     private LocalDateTime submittedAt;
 

@@ -25,7 +25,7 @@ public class MissionVerificationService {
         MissionVerification verification = MissionVerification.builder()
                 .userMission(userMission)
                 .imageUrl(imageUrl)
-                .verified(null) // 아직 AI 결과 미정
+                .isVerified(null) // 아직 AI 결과 미정
                 .submittedAt(LocalDateTime.now()) // 제출 시간 기록
                 .build();
 
@@ -37,7 +37,7 @@ public class MissionVerificationService {
         MissionVerification verification = missionVerificationRepository.findById(verificationId)
                 .orElseThrow();
 
-        verification.setVerified(isVerified);
+        verification.setIsVerified(isVerified);
         verification.setVerifiedAt(LocalDateTime.now());
         missionVerificationRepository.save(verification);
 
