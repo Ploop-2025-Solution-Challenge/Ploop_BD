@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 public class RouteRequestDto {
 
-    private String userId;
+    private Long userId;
     private List<List<Double>> activityRoute;
     private String timeDuration;
     private String updatedDateTime;

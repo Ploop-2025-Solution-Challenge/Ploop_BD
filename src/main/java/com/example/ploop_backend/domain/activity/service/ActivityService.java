@@ -32,7 +32,7 @@ public class ActivityService {
 
         // 사용자의 startDate~endDate의 데이터 조회
         List<Route> routes = routeRepository
-                .findByUserIdAndStartDateTimeBetween(user.getId().toString(), startDate.atStartOfDay(), endDate.atTime(23, 59));
+                .findAllByUserAndStartDateTimeBetween(user, startDate.atStartOfDay(), endDate.atTime(23, 59));
 
         // 전체 route 데이터를 stream으로 순회하며 합산
         int totalTrash = routes.stream().mapToInt(r -> Optional.ofNullable(r.getTrashCollectedCount()).orElse(0)).sum();

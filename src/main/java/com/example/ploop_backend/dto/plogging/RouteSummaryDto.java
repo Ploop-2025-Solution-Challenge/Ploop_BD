@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 public class RouteSummaryDto {
     private Long routeId;
-    private String userId;
+    private Long userId;
     private String timeDuration;
     private String updatedDateTime;
     private Double distanceMiles;
