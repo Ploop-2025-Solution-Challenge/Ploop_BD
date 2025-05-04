@@ -10,11 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,9 +82,10 @@ public class ActivityService {
 
         switch (range) {
             case "W":
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH);
                 for (int i = 0; i < 7; i++) {
                     LocalDate day = startDate.plusDays(i);
-                    String label = day.getDayOfWeek().toString().substring(0, 2);
+                    String label = day.format(formatter).toUpperCase();  // ex: MON
                     int count = (int) routes.stream()
                             .filter(r -> r.getStartDateTime().toLocalDate().equals(day))
                             .mapToInt(r -> Optional.ofNullable(r.getTrashCollectedCount()).orElse(0))
