@@ -93,6 +93,7 @@ public class RouteService {
         routeRepository.deleteById(routeId);
     }
 
+    // 모든 routeId 조회
     public List<RouteSummaryDto> getAllRoutes() {
         List<Route> routes = routeRepository.findAll();
 
