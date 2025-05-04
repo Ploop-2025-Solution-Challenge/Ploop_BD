@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 public class RouteResponseDto {
     private Long routeId;
-    private String userId;
+    private Long userId;
     private List<List<Double>> activityRoute; // JSON 문자열을 디코딩해서 사용.
     private String timeDuration;
     private String updatedDateTime;

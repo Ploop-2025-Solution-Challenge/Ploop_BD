@@ -1,6 +1,8 @@
 package com.example.ploop_backend.domain.plogging.service;
 
 import com.example.ploop_backend.domain.plogging.entity.Route;
+import com.example.ploop_backend.domain.user.entity.User;
+import com.example.ploop_backend.domain.user.repository.UserRepository;
 import com.example.ploop_backend.dto.plogging.RouteRequestDto;
 import com.example.ploop_backend.domain.plogging.repository.RouteRepository;
 import com.example.ploop_backend.dto.plogging.RouteResponseDto;
@@ -18,6 +20,8 @@ public class RouteService {
 
     private final RouteRepository routeRepository;
     private final ObjectMapper objectMapper; // 좌표리스트 -> JSON 문자열로 변환
+    private final UserRepository userRepository;
+
 
     public Long save(RouteRequestDto dto) throws Exception {
         LocalDateTime updated = LocalDateTime.parse(dto.getUpdatedDateTime());
@@ -25,8 +29,12 @@ public class RouteService {
 
         String routeJson = objectMapper.writeValueAsString(dto.getActivityRoute());
 
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
+
+
         Route route = Route.builder()
-                .userId(dto.getUserId())
+                .user(user)
                 .timeDuration(dto.getTimeDuration())
                 .updatedDateTime(updated)
                 .startDateTime(start)
@@ -50,7 +58,7 @@ public class RouteService {
 
         return RouteResponseDto.builder()
                 .routeId(route.getId())
-                .userId(route.getUserId())
+                .userId(route.getUser().getId())
                 .activityRoute(activityRoute)
                 .timeDuration(route.getTimeDuration())
                 .updatedDateTime(route.getUpdatedDateTime().toString())
@@ -60,8 +68,12 @@ public class RouteService {
                 .build();
     }
 
-    public List<RouteSummaryDto> getRoutesByUserId(String userId) {
-        List<Route> routes = routeRepository.findAllByUserId(userId);
+    // 특정 유저의 모든 routeId 조회
+    public List<RouteSummaryDto> getRoutesByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
+
+        List<Route> routes = routeRepository.findAllByUser(user);
 
         return routes.stream()
                 .map(route -> RouteSummaryDto.builder()
@@ -87,7 +99,7 @@ public class RouteService {
         return routes.stream()
                 .map(route -> RouteSummaryDto.builder()
                         .routeId(route.getId())
-                        .userId(route.getUserId())
+                        .userId(route.getUser().getId())
                         .timeDuration(route.getTimeDuration())
                         .updatedDateTime(route.getUpdatedDateTime().toString())
                         .distanceMiles(route.getDistanceMiles())

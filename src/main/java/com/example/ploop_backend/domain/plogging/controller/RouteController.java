@@ -27,7 +27,7 @@ public class RouteController {
     }
 
     @GetMapping("/user/{userId}")
-    public List<RouteSummaryDto> getRoutesByUser(@PathVariable("userId") String userId) {
+    public List<RouteSummaryDto> getRoutesByUser(@PathVariable("userId") Long userId) {
         return routeService.getRoutesByUserId(userId);
     }
 

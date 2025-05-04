@@ -1,5 +1,6 @@
 package com.example.ploop_backend.domain.plogging.entity;
 
+import com.example.ploop_backend.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -18,7 +19,9 @@ public class Route {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     private String timeDuration;
 
