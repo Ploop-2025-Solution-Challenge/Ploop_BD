@@ -50,8 +50,8 @@ public class WorldService {
             if (points.isEmpty()) return false; // 좌표 없음 → 제외
 
             // 첫 번째 좌표만 확인
-            double lng = points.get(0).get(0); // [lng, lat]
-            double lat = points.get(0).get(1);
+            double lat = points.get(0).get(0); // [lng, lat]
+            double lng = points.get(0).get(1);
 
             return lat >= minLat && lat <= maxLat
                     && lng >= minLng && lng <= maxLng;
