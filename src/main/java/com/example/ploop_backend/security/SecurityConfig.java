@@ -27,10 +27,19 @@ public class SecurityConfig {
                 .formLogin(login -> login.disable()) // 폼 로그인 비활성화
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/").permitAll()
+                        // 로그인, 회원가입은 인증 없이 허용
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/auth/google/redirect"
-                        ).permitAll()  // 로그인, 회원가입은 인증 없이 허용
+                        ).permitAll()
+                        // Swagger 관련 경로 허용
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/favicon.ico"
+                        ).permitAll()
                         .requestMatchers("/api/user/**").hasRole("USER") // USER 권한 필요
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/test/**").permitAll()

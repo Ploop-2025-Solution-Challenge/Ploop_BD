@@ -17,7 +17,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.sql.SQLIntegrityConstraintViolationException;
 //
 @Slf4j
-@RestControllerAdvice
+//@RestControllerAdvice // swagger에서 @ControllerAdvice로 인식하기 위해 주석 처리
 public class ExceptionControllerAdvice {
 
     @ExceptionHandler(value = {ConstraintViolationException.class, MethodArgumentNotValidException.class, MethodArgumentTypeMismatchException.class})
