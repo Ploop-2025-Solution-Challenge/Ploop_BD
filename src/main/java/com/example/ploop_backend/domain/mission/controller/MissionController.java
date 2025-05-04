@@ -103,6 +103,8 @@ public class MissionController {
 
         Team team = myMissions.get(0).getTeamMission().getTeam();
         User partner = team.getUser1().getId().equals(user.getId()) ? team.getUser2() : team.getUser1();
+        String partnerImageUrl = partner.getPicture();
+
 
         // 파트너 미션
         List<UserMission> partnerMissions = userMissionRepository.findAllByUser(partner);
@@ -130,6 +132,7 @@ public class MissionController {
 
         return ResponseEntity.ok(MissionSummaryResponseDto.builder()
                 .partnerName(partner.getNickname())
+                .partnerImageUrl(partnerImageUrl)
                 .partnerMissions(partnerMissionDtos)
                 .myMissions(myMissionsDtos)
                 .build());

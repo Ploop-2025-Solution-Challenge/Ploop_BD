@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MissionSummaryResponseDto {
     private String partnerName;
+    private String partnerImageUrl;
     private List<MissionSimpleDto> partnerMissions;
     private List<MissionSimpleDto> myMissions;
 }
