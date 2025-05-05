@@ -41,11 +41,11 @@ public class TeamMatchService {
                 .retrieve()
                 .toBodilessEntity()
                 .block();
-
         log.info("✅ 매칭 실행 완료");
 
         // 결과는 DB에서 직접 조회
         List<Team> matchedTeams = teamRepository.findAll();
+        log.info("🔍 조회된 매칭 수: {}", matchedTeams.size());
 
         if (matchedTeams.isEmpty()) {
             log.warn("❌ 매칭 결과가 DB에 존재하지 않습니다.");
@@ -53,8 +53,14 @@ public class TeamMatchService {
         }
         log.info("🔍 조회된 매칭 수: {}", matchedTeams.size());
 
-        // 팀 미션 할당
-        matchedTeams.forEach(teamMissionService::assignRandomMissionsToTeam);
+        for (Team team : matchedTeams) {
+            log.info("🎯 팀 미션 배정 시작 - teamId: {}", team.getId());
+            try {
+                teamMissionService.assignRandomMissionsToTeam(team); // ← 여기서 미션 할당됨
+            } catch (Exception e) {
+                log.error("💥 팀 미션 배정 중 예외 발생 - teamId: {}", team.getId(), e);
+            }
+        }
     }
 
     // 로컬 테스트용 매칭 결과 저장
