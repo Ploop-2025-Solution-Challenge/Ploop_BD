@@ -53,7 +53,7 @@ public class TeamMatchService {
             log.warn("!!!!! no matching result in DB.");
             return;
         }
-        log.info("🔍 조회된 매칭 수: {}", matchedTeams.size());
+        log.info("!!!! matching count: {}", matchedTeams.size());
 
         matchedTeams.forEach(teamMissionService::assignRandomMissionsToTeam);
         System.out.println("🚨 assignRandomMissionsToTeam 호출됨?");

@@ -30,13 +30,13 @@ public class TeamMissionService {
         User user1 = team.getUser1();
         User user2 = team.getUser2();
 
-        log.info("👥 팀 {}의 유저1: {}, 유저2: {}", team.getId(), user1 != null ? user1.getId() : "null", user2 != null ? user2.getId() : "null");
+        log.info("!!!! Team <{}>'s user1: '{}', user2: '{}'", team.getId(), user1 != null ? user1.getId() : "null", user2 != null ? user2.getId() : "null");
 
         List<Mission> missions = missionRepository.findRandomThree();
-        log.info("🎯 랜덤 미션 개수: {}", missions.size());
+        log.info("!!!! Random mission count: {}", missions.size());
 
         if (missions == null || missions.size() < 3) {
-            throw new IllegalStateException("랜덤 미션 3개를 가져오지 못했습니다.");
+            throw new IllegalStateException("cannot find enough random missions");
         }
 
         for (Mission mission : missions) {
@@ -46,7 +46,7 @@ public class TeamMissionService {
                             .mission(mission)
                             .build()
             );
-            log.info("✅ TeamMission 저장 - teamId: {}, missionId: {}", team.getId(), mission.getId());
+            log.info("!!!!!! TeamMission saved - teamId: {}, missionId: {}", team.getId(), mission.getId());
 
 
             userMissionRepository.save(
@@ -55,7 +55,7 @@ public class TeamMissionService {
             userMissionRepository.save(
                     UserMission.builder().user(user2).teamMission(teamMission).build()
             );
-            log.info("👤 UserMission 저장 - missionId: {}, users: {}, {}", mission.getId(), user1.getId(), user2.getId());
+            log.info("!!!!!! UserMission saved - missionId: {}, users: {}, {}", mission.getId(), user1.getId(), user2.getId());
         }
     }
 
