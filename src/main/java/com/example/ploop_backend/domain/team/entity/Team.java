@@ -7,14 +7,15 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
+@Table(name = "team")
+/*@Table(
         // 주차당 하나의 팀을 보장
         // user1_id와 user2_id는 서로 다른 유저여야 함
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"user1_id", "week"}),
                 @UniqueConstraint(columnNames = {"user2_id", "week"})
         }
-)
+)*/
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class Team {

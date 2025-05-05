@@ -7,7 +7,10 @@ import lombok.Data;
 @AllArgsConstructor
 public class TeamMatchResponseDto {
     private Long teamId;
-    private int missionCount;
-    private int userMissionsCreated;
+    //private int missionCount;
+    //private int userMissionsCreated;
+
+    private Long userId1;
+    private Long userId2;
 }
 
