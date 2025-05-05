@@ -51,8 +51,6 @@ public class TrashSpotController {
         return ResponseEntity.ok(result);
     }
 
-
-
     @GetMapping("/bounds")
     public ResponseEntity<List<TrashSpotDto>> getTrashSpotsWithinBounds(
             @RequestParam("minLat") double minLat,

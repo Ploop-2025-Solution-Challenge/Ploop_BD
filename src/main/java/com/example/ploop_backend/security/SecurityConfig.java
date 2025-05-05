@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/").permitAll()
                         // 로그인, 회원가입은 인증 없이 허용
+                        .requestMatchers("/api/test/**").permitAll()
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/auth/google/redirect"
@@ -42,7 +43,6 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/api/user/**").hasRole("USER") // USER 권한 필요
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/api/test/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/map/bin/**").permitAll()
                         .anyRequest().authenticated()                // 나머지는 인증 필요
                 )
