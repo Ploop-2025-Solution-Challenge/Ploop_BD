@@ -47,10 +47,21 @@ public class TeamMatchService {
 
         // 결과는 DB에서 직접 조회
         List<Team> teams = teamRepository.findAll();
-        for (Team t : teams) {
-            log.info("!!!!!! teamId: {}, user1: {}, user2: {}", t.getId(),
-                    t.getUser1() != null ? t.getUser1().getEmail() : "null",
-                    t.getUser2() != null ? t.getUser2().getEmail() : "null");
+        log.info("✅ 전체 팀 개수: {}", teams.size());
+
+        for (Team team : teams) {
+            try {
+                User user1 = team.getUser1();
+                User user2 = team.getUser2();
+
+                log.info("👥 팀 ID: {}, user1: {}, user2: {}",
+                        team.getId(),
+                        user1 != null ? user1.getEmail() : "null",
+                        user2 != null ? user2.getEmail() : "null"
+                );
+            } catch (Exception e) {
+                log.error("❌ 팀 정보 로딩 중 예외 발생 - teamId: {}", team.getId(), e);
+            }
         }
 
         List<Team> matchedTeams = teamRepository.findAllWithUsers();
