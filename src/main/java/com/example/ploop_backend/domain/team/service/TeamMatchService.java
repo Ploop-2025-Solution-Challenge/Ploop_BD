@@ -46,6 +46,13 @@ public class TeamMatchService {
         System.out.println("??????? matching finished!");
 
         // 결과는 DB에서 직접 조회
+        List<Team> teams = teamRepository.findAll();
+        for (Team t : teams) {
+            log.info("!!!!!! teamId: {}, user1: {}, user2: {}", t.getId(),
+                    t.getUser1() != null ? t.getUser1().getEmail() : "null",
+                    t.getUser2() != null ? t.getUser2().getEmail() : "null");
+        }
+
         List<Team> matchedTeams = teamRepository.findAllWithUsers();
         log.info("!!!!!! matching count: {}", matchedTeams.size());
 
