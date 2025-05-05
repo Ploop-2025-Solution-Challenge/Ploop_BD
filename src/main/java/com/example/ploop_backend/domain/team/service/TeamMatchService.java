@@ -54,14 +54,7 @@ public class TeamMatchService {
         }
         log.info("🔍 조회된 매칭 수: {}", matchedTeams.size());
 
-        for (Team team : matchedTeams) {
-            log.info("🎯 팀 미션 배정 시작 - teamId: {}", team.getId());
-            try {
-                teamMissionService.assignRandomMissionsToTeam(team); // ← 여기서 미션 할당됨
-            } catch (Exception e) {
-                log.error("💥 팀 미션 배정 중 예외 발생 - teamId: {}", team.getId(), e);
-            }
-        }
+        matchedTeams.forEach(teamMissionService::assignRandomMissionsToTeam);
     }
 
     // 로컬 테스트용 매칭 결과 저장
