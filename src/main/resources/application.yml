@@ -46,9 +46,9 @@ logging:
   level:
     root: INFO
     com.example.ploop_backend: INFO
-    org.springframework.security: INFO
-    org.hibernate.SQL: INFO
-    org.hibernate.type.descriptor.sql: INFO
+    org.springframework.security: INFO # DEBUG
+    org.hibernate.SQL: INFO # DEBUG
+    org.hibernate.type.descriptor.sql: INFO # TRACE
 
 
 jwt:
