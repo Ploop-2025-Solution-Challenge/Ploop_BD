@@ -39,16 +39,16 @@ public class TeamMatchService {
         webClient.post()
                 .uri("/match/weekly")
                 .retrieve()
-                .toBodilessEntity()
+                .bodyToMono(String.class)
                 .block();
-        log.info("✅ 매칭 실행 완료");
+        log.info("!!!!!!matching finished!!!!");
 
         // 결과는 DB에서 직접 조회
-        List<Team> matchedTeams = teamRepository.findAll();
-        log.info("🔍 조회된 매칭 수: {}", matchedTeams.size());
+        List<Team> matchedTeams = teamRepository.findAllWithUsers();
+        log.info("!!!!!! matching count: {}", matchedTeams.size());
 
         if (matchedTeams.isEmpty()) {
-            log.warn("❌ 매칭 결과가 DB에 존재하지 않습니다.");
+            log.warn("!!!!! no matching result in DB.");
             return;
         }
         log.info("🔍 조회된 매칭 수: {}", matchedTeams.size());
