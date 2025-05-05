@@ -35,43 +35,29 @@ public class TeamMatchService {
     public void matchAndSaveWeeklyTeams() {
         teamRepository.deleteAll();  // 매주 초기화
 
-        List<TeamMatchResponseDto> matches = webClient.post()
+        // AI 매칭 결과 가져오기
+        webClient.post()
                 .uri("/match/weekly")
                 .retrieve()
-                .bodyToFlux(TeamMatchResponseDto.class)
-                .collectList()
+                .toBodilessEntity()
                 .block();
 
-        if (matches == null || matches.isEmpty()) {
-            throw new IllegalStateException("AI 매칭 결과 없음");
+        log.info("✅ 매칭 실행 완료");
+
+        // 결과는 DB에서 직접 조회
+        List<Team> matchedTeams = teamRepository.findAll();
+
+        if (matchedTeams.isEmpty()) {
+            log.warn("❌ 매칭 결과가 DB에 존재하지 않습니다.");
+            return;
         }
+        log.info("🔍 조회된 매칭 수: {}", matchedTeams.size());
 
-        List<Team> teams = new ArrayList<>();
-        for (TeamMatchResponseDto match : matches) {
-            User user1 = userRepository.findById(match.getUserId1())
-                    .orElseThrow(() -> new IllegalArgumentException("User1 not found: " + match.getUserId1()));
-            User user2 = userRepository.findById(match.getUserId2())
-                    .orElseThrow(() -> new IllegalArgumentException("User2 not found: " + match.getUserId2()));
-
-            Team team = Team.builder()
-                    .user1(user1)
-                    .user2(user2)
-                    .week(match.getWeek())
-                    .createdAt(match.getCreatedAt())
-                    .build();
-
-            log.info("🔍 매칭된 유저: userId1={}, userId2={}", match.getUserId1(), match.getUserId2());
-
-            teams.add(team);
-        }
-
-
-        teamRepository.saveAll(teams);
-        log.info("✅ {}개의 팀이 저장되었습니다.", teams.size());
-
-        teams.forEach(teamMissionService::assignRandomMissionsToTeam);
+        // 팀 미션 할당
+        matchedTeams.forEach(teamMissionService::assignRandomMissionsToTeam);
     }
 
+    // 로컬 테스트용 매칭 결과 저장
     @Transactional
     public void saveMatchedTeams(List<TeamMatchResponseDto> matches) {
         teamRepository.deleteAll();  // 매주 초기화
@@ -97,6 +83,7 @@ public class TeamMatchService {
     }
 
 
+    // 로컬 테스트용 매칭 결과 조회
     @Transactional
     public void resetWeeklyMatches() {
         userMissionRepository.deleteAll();

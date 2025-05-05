@@ -24,10 +24,14 @@ public class TeamMissionService {
     private final UserMissionRepository userMissionRepository;
 
     @Transactional
-    public int assignRandomMissionsToTeam(Team team) {
+    public void assignRandomMissionsToTeam(Team team) {
         User user1 = team.getUser1();
         User user2 = team.getUser2();
+
         List<Mission> missions = missionRepository.findRandomThree();
+        if (missions == null || missions.size() < 3) {
+            throw new IllegalStateException("랜덤 미션 3개를 가져오지 못했습니다.");
+        }
 
         for (Mission mission : missions) {
             TeamMission teamMission = teamMissionRepository.save(
@@ -37,10 +41,13 @@ public class TeamMissionService {
                             .build()
             );
 
-            userMissionRepository.save(UserMission.builder().user(user1).teamMission(teamMission).build());
-            userMissionRepository.save(UserMission.builder().user(user2).teamMission(teamMission).build());
+            userMissionRepository.save(
+                    UserMission.builder().user(user1).teamMission(teamMission).build()
+            );
+            userMissionRepository.save(
+                    UserMission.builder().user(user2).teamMission(teamMission).build()
+            );
         }
-
-        return missions.size();
     }
+
 }
