@@ -78,17 +78,33 @@ public class TeamMatchService {
         System.out.println("????? assignRandomMissionsToTeam called??");
     }
 
-    // 로컬 테스트용 매칭 결과 저장
     @Transactional
     public void saveMatchedTeams(List<TeamMatchResponseDto> matches) {
         teamRepository.deleteAll();  // 매주 초기화
 
         List<Team> teams = matches.stream()
                 .map(m -> {
+                    log.info("🔍 매칭 정보: userId1={}, userId2={}, week={}, createdAt={}",
+                            m.getUserId1(), m.getUserId2(), m.getWeek(), m.getCreatedAt());
+
+                    if (m.getUserId1() == null || m.getUserId2() == null) {
+                        log.error("❌ userId가 null입니다: userId1={}, userId2={}", m.getUserId1(), m.getUserId2());
+                        throw new IllegalArgumentException("userId must not be null");
+                    }
+
                     User user1 = userRepository.findById(m.getUserId1())
-                            .orElseThrow(() -> new IllegalArgumentException("User1 not found: " + m.getUserId1()));
+                            .orElseThrow(() -> {
+                                log.error("❌ User1 not found: {}", m.getUserId1());
+                                return new IllegalArgumentException("User1 not found: " + m.getUserId1());
+                            });
+
                     User user2 = userRepository.findById(m.getUserId2())
-                            .orElseThrow(() -> new IllegalArgumentException("User2 not found: " + m.getUserId2()));
+                            .orElseThrow(() -> {
+                                log.error("❌ User2 not found: {}", m.getUserId2());
+                                return new IllegalArgumentException("User2 not found: " + m.getUserId2());
+                            });
+
+                    log.info("✅ 사용자 조회 완료: user1={}, user2={}", user1.getEmail(), user2.getEmail());
 
                     return Team.builder()
                             .user1(user1)
@@ -99,9 +115,20 @@ public class TeamMatchService {
                 })
                 .toList();
 
+        log.info("💾 총 {}개의 팀 저장 시도 중", teams.size());
         teamRepository.saveAll(teams);
-        teams.forEach(teamMissionService::assignRandomMissionsToTeam);
+        log.info("✅ 팀 저장 완료");
+
+        teams.forEach(team -> {
+            log.info("🎯 팀 미션 배정 시작 - teamId: {}", team.getId());
+            try {
+                teamMissionService.assignRandomMissionsToTeam(team);
+            } catch (Exception e) {
+                log.error("💥 팀 미션 배정 중 예외 발생 - teamId: {}", team.getId(), e);
+            }
+        });
     }
+
 
 
     // 로컬 테스트용 매칭 결과 조회
