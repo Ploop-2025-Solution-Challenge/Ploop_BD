@@ -46,9 +46,9 @@ public class TeamMatchService {
         System.out.println("??????? matching finished!");
 
         // 결과는 DB에서 직접 조회
-        log.warn("🚨🚨🚨 Team 조회 시작됨");
+        log.warn("!!!! Team load started");
         List<Team> teams = teamRepository.findAll();
-        log.warn("🚨🚨🚨 Team 조회 완료 - count: {}", teams.size());
+        log.warn("!!!! Team load finished - count: {}", teams.size());
 
         for (Team team : teams) {
             try {
