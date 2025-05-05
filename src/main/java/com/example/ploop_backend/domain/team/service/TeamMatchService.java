@@ -43,6 +43,7 @@ public class TeamMatchService {
                 .bodyToMono(TeamMatchDto.class)
                 .block();
         log.info("!!!!!!matching finished!!!!");
+        System.out.println("!!!!!!! matching finished!");
 
         // 결과는 DB에서 직접 조회
         List<Team> matchedTeams = teamRepository.findAllWithUsers();
@@ -55,6 +56,7 @@ public class TeamMatchService {
         log.info("🔍 조회된 매칭 수: {}", matchedTeams.size());
 
         matchedTeams.forEach(teamMissionService::assignRandomMissionsToTeam);
+        System.out.println("🚨 assignRandomMissionsToTeam 호출됨?");
     }
 
     // 로컬 테스트용 매칭 결과 저장
