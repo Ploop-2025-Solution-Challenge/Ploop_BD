@@ -12,9 +12,9 @@ public class RouteResponseDto {
     private Long routeId;
     private Long userId;
     private List<List<Double>> activityRoute; // JSON 문자열을 디코딩해서 사용.
-    private String timeDuration;
+    private Double timeDuration;
+    private Double distanceMiles;
     private String updatedDateTime;
     private String startDateTime;
-    private Double distanceMiles;
     private Integer trashCollectedCount;
 }

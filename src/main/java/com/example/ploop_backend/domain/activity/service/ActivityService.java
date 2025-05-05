@@ -37,9 +37,7 @@ public class ActivityService {
         // 전체 route 데이터를 stream으로 순회하며 합산
         int totalTrash = routes.stream().mapToInt(r -> Optional.ofNullable(r.getTrashCollectedCount()).orElse(0)).sum();
         double totalMiles = routes.stream().mapToDouble(r -> Optional.ofNullable(r.getDistanceMiles()).orElse(0.0)).sum();
-        double totalHours = routes.stream()
-                .mapToDouble(r -> parseDurationToHours(r.getTimeDuration()))
-                .sum();
+        double totalHours = routes.stream().mapToDouble(r -> Optional.ofNullable(r.getTimeDuration()).orElse(0.0)).sum();
 
         // W, M, Y 값에 따라 데이터를 그룹화
         List<GraphDataDto> graphData = groupByRange(range, routes, startDate);
@@ -63,18 +61,6 @@ public class ActivityService {
         return new ActivityStatsResponseDto(
                 totalTrash, totalMiles, totalHours, challengeCompleted, challengeGoal, graphData
         );
-    }
-
-    private double parseDurationToHours(String duration) {
-        // ex. "00:45:00" → 0.75
-        try {
-            String[] parts = duration.split(":");
-            int hours = Integer.parseInt(parts[0]);
-            int minutes = Integer.parseInt(parts[1]);
-            return hours + (minutes / 60.0);
-        } catch (Exception e) {
-            return 0.0;
-        }
     }
 
     private List<GraphDataDto> groupByRange(String range, List<Route> routes, LocalDate startDate) {

@@ -22,13 +22,13 @@ public class Route {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private String timeDuration;
+    private Double timeDuration;
+
+    private Double distanceMiles;
 
     private LocalDateTime updatedDateTime;
 
     private LocalDateTime startDateTime;
-
-    private Double distanceMiles;
 
     private Integer trashCollectedCount;
 

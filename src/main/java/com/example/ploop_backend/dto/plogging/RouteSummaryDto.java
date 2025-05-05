@@ -10,7 +10,7 @@ import lombok.*;
 public class RouteSummaryDto {
     private Long routeId;
     private Long userId;
-    private String timeDuration;
+    private Double timeDuration;
     private String updatedDateTime;
     private Double distanceMiles;
     private Integer trashCollectedCount;

@@ -25,7 +25,7 @@ public class RouteService {
 
     public Long save(RouteRequestDto dto) throws Exception {
         LocalDateTime updated = LocalDateTime.parse(dto.getUpdatedDateTime());
-        LocalDateTime start = updated.minusMinutes((long) (Double.parseDouble(dto.getTimeDuration()) * 60));
+        LocalDateTime start = updated.minusMinutes((long) (dto.getTimeDuration() * 60));
 
         String routeJson = objectMapper.writeValueAsString(dto.getActivityRoute());
 
