@@ -1,16 +1,23 @@
 package com.example.ploop_backend.domain.team.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class TeamMatchResponseDto {
-    private Long teamId;
-    //private int missionCount;
-    //private int userMissionsCreated;
-
+    @JsonProperty("user_id_1")
     private Long userId1;
+
+    @JsonProperty("user_id_2")
     private Long userId2;
+
+    private String week;
+    private LocalDateTime createdAt;
 }
 

@@ -1,13 +1,11 @@
 package com.example.ploop_backend.domain.team.controller;
 
-import com.example.ploop_backend.domain.team.dto.TeamMatchRequest;
 import com.example.ploop_backend.domain.team.dto.TeamMatchResponseDto;
 import com.example.ploop_backend.domain.team.dto.TeamMissionDto;
 import com.example.ploop_backend.domain.team.entity.TeamMission;
 import com.example.ploop_backend.domain.team.repository.TeamMissionRepository;
 import com.example.ploop_backend.domain.team.service.TeamMatchService;
 import com.example.ploop_backend.domain.team.service.TeamMissionService;
-import com.example.ploop_backend.domain.team.entity.Team;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// 유저 매칭 -> 팀 생성 -> 미션 배정 (내부 호출)
-// 매칭 POST /match
-// 주차별 팀 매칭 현황 GET/admin?week=2025-W17
 @RestController
 @RequestMapping("/api/team")
 @RequiredArgsConstructor
@@ -27,12 +22,10 @@ public class TeamController {
     private final TeamMissionService teamMissionService;
     private final TeamMissionRepository teamMissionRepository;
 
-    // 팀 매칭
-    @PostMapping("/match")
-    public ResponseEntity<TeamMatchResponseDto> matchUsersToTeam(@RequestBody TeamMatchRequest request) {
-        Team team = teamMatchService.createTeam(request.getUser1Id(), request.getUser2Id(), request.getWeek());
-        int missionCount = teamMissionService.assignRandomMissionsToTeam(team);
-        return ResponseEntity.ok(new TeamMatchResponseDto(team.getId(), missionCount, missionCount * 2));
+    @PostMapping("/match-weekly")
+    public ResponseEntity<Void> triggerTeamMatch() {
+        teamMatchService.matchAndSaveWeeklyTeams();
+        return ResponseEntity.ok().build();
     }
 
     // 팀별 미션 조회
@@ -43,6 +36,13 @@ public class TeamController {
                 .map(TeamMissionDto::from)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(result);
+    }
+
+    // 로컬 테스트용 매칭 결과 저장 서버에서는 사용하지 않음
+    @PostMapping("/match-weekly/local")
+    public ResponseEntity<String> matchWeeklyLocal(@RequestBody List<TeamMatchResponseDto> matches) {
+        teamMatchService.saveMatchedTeams(matches);
+        return ResponseEntity.ok("로컬 DB에 매칭 결과 저장 완료 ✅");
     }
 }
 

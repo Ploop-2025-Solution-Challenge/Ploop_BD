@@ -8,14 +8,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "team")
-/*@Table(
-        // 주차당 하나의 팀을 보장
-        // user1_id와 user2_id는 서로 다른 유저여야 함
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"user1_id", "week"}),
-                @UniqueConstraint(columnNames = {"user2_id", "week"})
-        }
-)*/
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class Team {
@@ -23,6 +15,8 @@ public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     private String week; // ISO 형식 : 2025-W01
 
@@ -34,5 +28,5 @@ public class Team {
     @JoinColumn(name = "user_id_2")
     private User user2;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+
 }
