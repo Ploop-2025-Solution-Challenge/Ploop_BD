@@ -10,6 +10,7 @@ import com.example.ploop_backend.domain.team.repository.TeamMissionRepository;
 import com.example.ploop_backend.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class TeamMissionService {
     private final TeamMissionRepository teamMissionRepository;
     private final UserMissionRepository userMissionRepository;
 
+    @Transactional
     public int assignRandomMissionsToTeam(Team team) {
         User user1 = team.getUser1();
         User user2 = team.getUser2();
