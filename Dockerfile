@@ -26,6 +26,10 @@ RUN ./gradlew build --no-daemon
 # 두 번째 스테이지: 실행 스테이지
 FROM ghcr.io/graalvm/jdk-community:17
 
+# 🟡 UTF-8 로케일 설정 추가
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
 # 작업 디렉토리 설정
 WORKDIR /app
 

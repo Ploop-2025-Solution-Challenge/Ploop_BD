@@ -5,7 +5,7 @@ import java.util.Arrays;
 public enum Gender {
     FEMALE("Female"),
     MALE("Male"),
-    NOT_SPECIFIED("Prefer not to say");
+    UNKNOWN("Prefer not to say");
 
     private final String label;
 
