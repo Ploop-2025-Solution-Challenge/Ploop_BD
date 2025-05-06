@@ -18,6 +18,8 @@ public class Mission {
 
     @Enumerated(EnumType.STRING)
     private Category category;      // 쓰레기 유형 등
+
+    private int requiredCount;      // 몇 개 주워야 하는지
 }
 
 

@@ -1,7 +1,6 @@
 package com.example.ploop_backend.domain.team.service;
 
 import com.example.ploop_backend.domain.mission.repository.UserMissionRepository;
-import com.example.ploop_backend.domain.team.dto.TeamMatchDto;
 import com.example.ploop_backend.domain.team.dto.TeamMatchResponseDto;
 import com.example.ploop_backend.domain.team.entity.Team;
 import com.example.ploop_backend.domain.team.repository.TeamMissionRepository;

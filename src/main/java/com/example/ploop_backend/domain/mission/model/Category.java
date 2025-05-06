@@ -15,4 +15,16 @@ public enum Category {
     Category(String displayName) {
         this.displayName = displayName;
     }
+
+    public static Category mapClassNameToCategory(String className) {
+        className = className.toLowerCase();
+
+        if (className.contains("can")) return Category.EMPTY_CAN;
+        if (className.contains("bottle cap")) return Category.BOTTLE_CAP;
+        if (className.contains("bottle")) return Category.PLASTIC_BOTTLE;
+        if (className.contains("cup")) return Category.PAPER_CUP;
+        if (className.contains("bag") || className.contains("vinyl")) return Category.VINYL_BAG;
+
+        return null;
+    }
 }

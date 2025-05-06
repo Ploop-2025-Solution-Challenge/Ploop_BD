@@ -30,31 +30,37 @@ public class TeamMissionService {
         User user1 = team.getUser1();
         User user2 = team.getUser2();
 
-        log.info("!!!! Team <{}>'s user1: '{}', user2: '{}'", team.getId(), user1 != null ? user1.getId() : "null", user2 != null ? user2.getId() : "null");
-
         List<Mission> missions = missionRepository.findRandomThree();
-        log.info("!!!! Random mission count: {}", missions.size());
 
         if (missions == null || missions.size() < 3) {
             throw new IllegalStateException("cannot find enough random missions");
         }
 
         for (Mission mission : missions) {
+            // 팀 미션에 저장
             TeamMission teamMission = teamMissionRepository.save(
                     TeamMission.builder()
                             .team(team)
                             .mission(mission)
                             .build()
             );
-            log.info("!!!!!! TeamMission saved - teamId: {}, missionId: {}", team.getId(), mission.getId());
 
-
+            // 2. UserMission 저장 - mission 필드 포함
             userMissionRepository.save(
-                    UserMission.builder().user(user1).teamMission(teamMission).build()
+                    UserMission.builder()
+                            .user(user1)
+                            .teamMission(teamMission)
+                            .mission(mission) // 미션 id를 추가
+                            .build()
             );
             userMissionRepository.save(
-                    UserMission.builder().user(user2).teamMission(teamMission).build()
+                    UserMission.builder()
+                            .user(user2)
+                            .teamMission(teamMission)
+                            .mission(mission) // 미션 id
+                            .build()
             );
+
             log.info("!!!!!! UserMission saved - missionId: {}, users: {}, {}", mission.getId(), user1.getId(), user2.getId());
         }
     }

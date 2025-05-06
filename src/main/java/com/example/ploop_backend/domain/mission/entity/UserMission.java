@@ -29,6 +29,10 @@ public class UserMission {
 
     private Boolean isVerified = false;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mission_id")
+    private Mission mission;
+
     @CreatedDate
     private LocalDateTime createdAt;
 }

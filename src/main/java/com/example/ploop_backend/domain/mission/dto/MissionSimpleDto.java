@@ -8,6 +8,7 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class MissionSimpleDto {
+    private Long userMissionId;
     private String name;
     private boolean isVerified;
 }
