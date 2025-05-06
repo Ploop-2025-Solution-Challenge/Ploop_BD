@@ -23,7 +23,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 5. 전체 코드 복사 (모델 포함)
 COPY . .
 
-# 6. FastAPI 서버 포트 설정
+# 6. FastAPI 서버 포트 설정 (8000)
 EXPOSE 8000
 
 # 7. 컨테이너 시작 시 FastAPI 실행
