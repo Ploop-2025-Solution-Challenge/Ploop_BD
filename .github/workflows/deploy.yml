@@ -62,13 +62,7 @@ jobs:
         env:
           ACTIONS_STEP_DEBUG: true
           APPLICATION_SECRET: ${{ secrets.APPLICATION_SECRET_YML }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          echo "$APPLICATION_SECRET" > src/main/resources/application-secret.yml
-          echo "" >> src/main/resources/application-secret.yml
-          echo "gemini:" >> src/main/resources/application-secret.yml
-          echo "  api:" >> src/main/resources/application-secret.yml
-          echo "    key: ${GEMINI_API_KEY}" >> src/main/resources/application-secret.yml
+        run: echo "$APPLICATION_SECRET" > src/main/resources/application-secret.yml
       - name: 빌드 앤 푸시
         uses: docker/build-push-action@v3
         with:
@@ -95,4 +89,4 @@ jobs:
             mkdir -p /dockerProjects/blog
             curl -o /dockerProjects/blog/zere_downtime_deploy.py https://raw.githubusercontent.com/Ploop-2025-Solution-Challenge/Ploop_BD/main/infraScript/zere_downtime_deploy.py
             chmod +x /dockerProjects/blog/zere_downtime_deploy.py
-            python3 /dockerProjects/blog/zere_downtime_deploy.py
+            python3 /dockerProjects/blog/zere_downtime_deploy.py  
