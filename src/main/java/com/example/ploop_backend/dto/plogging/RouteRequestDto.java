@@ -9,9 +9,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class RouteRequestDto {
-
     private Long userId;
-    private List<List<Double>> activityRoute;   // JSON 문자열을 디코딩해서 사용.
+    private List<List<Double>> activityRoute;
     private String updatedDateTime;
     private Double timeDuration;
     private Double distanceMiles;
