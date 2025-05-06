@@ -29,7 +29,7 @@ public class TeamMatchService {
     private final UserMissionRepository userMissionRepository;
 
     private final WebClient webClient = WebClient.builder()
-            .baseUrl("http://34.59.147.153:8000")
+            .baseUrl("http://35.224.212.56:8000")
             .build();
 
     @Transactional
