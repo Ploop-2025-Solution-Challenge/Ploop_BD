@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 public class TeamController {
 
     private final TeamMatchService teamMatchService;
-    private final TeamMissionService teamMissionService;
     private final TeamMissionRepository teamMissionRepository;
 
     @PostMapping("/match-weekly")

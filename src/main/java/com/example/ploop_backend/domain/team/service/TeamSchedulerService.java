@@ -17,10 +17,11 @@ public class TeamSchedulerService {
     // 매주 월요일 오전 9시에 실행 (cron: 초 분 시 일 월 요일)
     @Scheduled(cron = "0 0 0 * * MON", zone = "UTC")
     public void scheduleWeeklyTeamMatching() {
-        log.info("✅ 매주 팀 매칭 스케줄러 시작");
+        log.info("!!!!! every week, matching schedular start");
         try {
-            teamMatchService.matchAndSaveWeeklyTeams();
-            log.info("✅ 매주 팀 매칭 완료");
+            teamMatchService.matchWeeklyTeams(); // 매칭 실행
+            teamMatchService.assignWeeklyMissions(); // 미션 할당
+            log.info("!!!!! every week, team matching finished");
         } catch (Exception e) {
             log.error("❌ 매주 팀 매칭 실패", e);
         }
