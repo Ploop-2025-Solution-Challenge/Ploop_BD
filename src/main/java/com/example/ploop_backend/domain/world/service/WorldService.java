@@ -25,6 +25,10 @@ public class WorldService {
         return routeRepository.findAll().stream()
                 .map(route -> {
                     String json = route.getActivityRouteJson();
+                    log.info("✅ WorldRouteDto 클래스 필드: {}, {}, {}",
+                            WorldRouteDto.class.getDeclaredFields()[0].getName(),
+                            WorldRouteDto.class.getDeclaredFields()[1].getName(),
+                            WorldRouteDto.class.getDeclaredFields()[2].getName());
                     try {
                         log.info("Parsing activityRouteJson for routeId {}: {}", route.getId(), json); // 🔍 로그 추가
                         List<List<Double>> activityRoute = objectMapper.readValue(
