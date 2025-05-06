@@ -32,7 +32,6 @@ public class MissionController {
     private final MissionVerificationService missionVerificationService;
 
     // 유저의 전체 미션 조회 (3개)
-    // 유저의 전체 미션 조회 (프론트 요건에 맞게 응답 형태 변경)
     @GetMapping
     public ResponseEntity<Map<String, Object>> getMyMissions(@AuthenticationPrincipal User user) {
         List<UserMission> missions = userMissionRepository.findAllByUser(user);
@@ -65,31 +64,6 @@ public class MissionController {
         return ResponseEntity.ok(dto);
     }
 
-
-    // 인증 사진 제출 (AI가 판단할 사진 제출)
-    @PostMapping("/{userMissionId}/verify")
-    public ResponseEntity<?> submitVerification(
-            @PathVariable Long userMissionId,
-            @RequestParam("image") MultipartFile image
-    ) {
-        try {
-            String imageUrl = imageUploadService.saveImageToCloud(image);
-            MissionVerification verification = missionVerificationService.createVerification(userMissionId, imageUrl);
-
-            return ResponseEntity.ok(Map.of(
-                    "userMissionId", userMissionId,
-                    "status", "PENDING",
-                    "imageUrl", imageUrl,
-                    "verificationId", verification.getId(),
-                    "message", "사진이 업로드되었고, 인증이 대기 중입니다."
-            ));
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body(Map.of(
-                    "error", "500 error : 파일 업로드 중 오류가 발생했습니다.",
-                    "detail", e.getMessage()
-            ));
-        }
-    }
 
     // 미션 요약 조회: 파트너, 파트너 미션, 내 이번 주 미션 포함
     @GetMapping("/summary")
