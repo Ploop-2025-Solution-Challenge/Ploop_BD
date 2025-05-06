@@ -8,10 +8,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WorldService {
@@ -22,7 +24,9 @@ public class WorldService {
     public List<WorldRouteDto> getAllRoutes() {
         return routeRepository.findAll().stream()
                 .map(route -> {
+                    String json = route.getActivityRouteJson();
                     try {
+                        log.info("Parsing activityRouteJson for routeId {}: {}", route.getId(), json); // 🔍 로그 추가
                         List<List<Double>> activityRoute = objectMapper.readValue(
                                 route.getActivityRouteJson(),
                                 new TypeReference<>() {}
