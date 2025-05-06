@@ -26,7 +26,7 @@ public class MissionVerificationService {
                 .userMission(userMission)
                 .imageUrl(imageUrl)
                 .isVerified(null) // 아직 AI 결과 미정
-                .submittedAt(LocalDateTime.now()) // 제출 시간 기록
+                .verifiedAt(LocalDateTime.now()) // 제출 시간 기록
                 .build();
 
         return missionVerificationRepository.save(verification);

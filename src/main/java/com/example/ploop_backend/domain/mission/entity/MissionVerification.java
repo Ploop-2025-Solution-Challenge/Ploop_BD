@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter @Setter
@@ -16,14 +17,18 @@ public class MissionVerification {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_mission_id")
-
     private UserMission userMission;
+
+    private Long userId; // 인증한 사용자 ID
+
+    private int totalCount;
+
+    @ElementCollection
+    private List<String> types;
 
     private String imageUrl;
 
     private Boolean isVerified;
-
-    private LocalDateTime submittedAt;
 
     private LocalDateTime verifiedAt;
 }
