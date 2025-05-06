@@ -24,7 +24,8 @@ public class TeamController {
 
     @PostMapping("/match-weekly")
     public ResponseEntity<Void> triggerTeamMatch() {
-        teamMatchService.matchAndSaveWeeklyTeams();
+        teamMatchService.matchWeeklyTeams(); // 매칭 실행
+        teamMatchService.assignWeeklyMissions(); // 미션 할당
         return ResponseEntity.ok().build();
     }
 

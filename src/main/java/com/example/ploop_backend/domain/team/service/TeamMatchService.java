@@ -33,20 +33,23 @@ public class TeamMatchService {
             .build();
 
     @Transactional
-    public void matchAndSaveWeeklyTeams() {
-        teamRepository.deleteAll();  // 매주 초기화
+    public void matchWeeklyTeams() {
+        teamRepository.deleteAll(); // 매주 초기화
 
         // AI 매칭 결과 가져오기
         webClient.post()
                 .uri("/match/weekly")
                 .retrieve()
-                .bodyToMono(TeamMatchDto.class)
-                .block();
-        log.info("!!!!!!matching finished!!!!");
-        System.out.println("??????? matching finished!");
+                .bodyToMono(Void.class)
+                .block(); // 매칭 실행만
 
+        log.info("!!!!!!matching finished!!!!");
+    }
+
+
+    @Transactional
+    public void assignWeeklyMissions() {
         // 결과는 DB에서 직접 조회
-        log.warn("!!!! Team load started");
         List<Team> teams = teamRepository.findAll();
         log.warn("!!!! Team load finished - count: {}", teams.size());
 
@@ -55,13 +58,13 @@ public class TeamMatchService {
                 User user1 = team.getUser1();
                 User user2 = team.getUser2();
 
-                log.info("👥 팀 ID: {}, user1: {}, user2: {}",
+                log.info("!!!!! team ID: {}, user1: {}, user2: {}",
                         team.getId(),
                         user1 != null ? user1.getEmail() : "null",
                         user2 != null ? user2.getEmail() : "null"
                 );
             } catch (Exception e) {
-                log.error("❌ 팀 정보 로딩 중 예외 발생 - teamId: {}", team.getId(), e);
+                log.error("!!!!! error - teamId: {}", team.getId(), e);
             }
         }
 
