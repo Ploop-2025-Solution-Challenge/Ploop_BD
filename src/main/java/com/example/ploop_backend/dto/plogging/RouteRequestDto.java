@@ -11,7 +11,7 @@ import java.util.List;
 public class RouteRequestDto {
 
     private Long userId;
-    private List<List<Double>> activityRoute;
+    private List<List<Double>> activityRoute;   // JSON 문자열을 디코딩해서 사용.
     private String updatedDateTime;
     private Double timeDuration;
     private Double distanceMiles;
