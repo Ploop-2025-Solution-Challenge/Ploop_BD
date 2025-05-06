@@ -39,6 +39,7 @@ public class WorldService {
                                 .build();
 
                     } catch (JsonProcessingException e) {
+                        log.error("❌ JSON 파싱 실패: routeId = {}, json = {}", route.getId(), json, e);
                         throw new RuntimeException("경로 JSON 파싱 실패: routeId = " + route.getId(), e);
                     }
                 })
