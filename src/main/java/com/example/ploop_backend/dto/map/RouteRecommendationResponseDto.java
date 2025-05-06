@@ -10,5 +10,4 @@ import java.util.List;
 public class RouteRecommendationResponseDto {
     private List<List<Double>> recommendationRoute;
     private String motivation;
-    //private List<List<Double>> activityRoute;
 }
