@@ -19,7 +19,7 @@ import java.util.List;
 public class GoogleTokenVerifier {
     // Google OAuth ID Token을 검증하는 클래스
 
-    @Value("#{'${google.clientIds}'.split(',')}")
+    @Value("#{'${google.clientIds}'.split(',')}") // clientId 목록을 가져옴
     private List<String> clientIds; // application-secret.yml에 등록된 clientId 목록을 가져옴
 
     public GoogleUserDto verify(String idTokenString) {
