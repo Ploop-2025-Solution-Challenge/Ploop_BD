@@ -19,8 +19,7 @@ public class GoogleTokenVerifier {
     // Google OAuth ID Token을 검증하는 클래스
 
     @Value("${google.clientIds}")
-    private List<String> clientIds;
-
+    private List<String> clientIds; // application-secret.yml에 등록된 clientId 목록을 가져옴
 
     public GoogleUserDto verify(String idTokenString) {
         try {
