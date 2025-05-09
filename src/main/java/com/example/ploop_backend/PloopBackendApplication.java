@@ -1,11 +1,13 @@
 package com.example.ploop_backend;
 
+import com.example.ploop_backend.config.GoogleProperties;
 import com.example.ploop_backend.domain.user.entity.User;
 import com.example.ploop_backend.domain.user.model.Role;
 import com.example.ploop_backend.domain.user.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -14,6 +16,7 @@ import org.springframework.web.multipart.support.MultipartFilter;
 
 @EnableScheduling
 @EnableJpaAuditing
+@EnableConfigurationProperties(GoogleProperties.class)
 @SpringBootApplication
 public class PloopBackendApplication implements CommandLineRunner {
 
