@@ -3,6 +3,7 @@ package com.example.ploop_backend.domain.auth.service;
 import com.example.ploop_backend.dto.auth.GoogleUserDto;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -18,7 +19,7 @@ import java.util.List;
 public class GoogleTokenVerifier {
     // Google OAuth ID Token을 검증하는 클래스
 
-    @Value("${google.clientIds}")
+    @Value("#{'${google.clientIds}'.split(',')}")
     private List<String> clientIds; // application-secret.yml에 등록된 clientId 목록을 가져옴
 
     public GoogleUserDto verify(String idTokenString) {
