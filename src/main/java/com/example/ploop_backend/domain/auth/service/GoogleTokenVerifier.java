@@ -11,14 +11,15 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 
 
 import java.util.Collections;
+import java.util.List;
 
 
 @Component
 public class GoogleTokenVerifier {
     // Google OAuth ID Token을 검증하는 클래스
 
-    @Value("${google.clientId}")
-    private String clientId;
+    @Value("${google.clientIds}")
+    private List<String> clientIds;
 
 
     public GoogleUserDto verify(String idTokenString) {
@@ -26,7 +27,7 @@ public class GoogleTokenVerifier {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder( // ID 토큰 검증기 생성
                     GoogleNetHttpTransport.newTrustedTransport(),
                     JacksonFactory.getDefaultInstance())
-                    .setAudience(Collections.singletonList(clientId))
+                    .setAudience(clientIds)
                     .build();
 
             GoogleIdToken idToken = verifier.verify(idTokenString);
