@@ -110,13 +110,9 @@ public class MissionVerificationService {
                 .verifiedAt(LocalDateTime.now())
                 .build());
 
-        // UserMission 업데이트 (팀 전체)
-        TeamMission teamMission = userMission.getTeamMission();
-        List<UserMission> relatedMissions = userMissionRepository.findAllByTeamMission(teamMission);
-        for (UserMission um : relatedMissions) {
-            um.setIsVerified(isVerified);
-        }
-        userMissionRepository.saveAll(relatedMissions);
+        // UserMission 업데이트
+        userMission.setIsVerified(isVerified);
+        userMissionRepository.save(userMission);
 
         // 응답 반환
         Map<String, Object> response = new HashMap<>();
