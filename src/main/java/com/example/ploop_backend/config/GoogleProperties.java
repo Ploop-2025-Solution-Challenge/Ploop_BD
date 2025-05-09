@@ -9,7 +9,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@Component
 @ConfigurationProperties(prefix = "google")
 public class GoogleProperties {
     private List<String> clientIds;
