@@ -24,7 +24,7 @@ public class GoogleTokenVerifier {
 
     @PostConstruct
     public void check() {
-        System.out.println("!!!! google.clientIds = " + googleProperties.getClientIds());
+        System.out.println("!!!! google.clientIds = " + googleProperties.getClientIds()); // 구글 클라이언트 ID 확인
     }
 
     public GoogleUserDto verify(String idTokenString) {
