@@ -33,9 +33,11 @@ public class AuthService {
     private String googleClientId;
 
     public JwtResponseDto login(String code) {
+        System.out.println("!!!! [AuthService] Received ID Token: " + code);
         GoogleUserDto googleUser = googleTokenVerifier.verify(code);
 
         if (googleUser == null) {
+            System.err.println("!!!! [AuthService] Failed to verify ID Token: token is null or invalid");
             throw new RuntimeException("google user not found");
         }
 

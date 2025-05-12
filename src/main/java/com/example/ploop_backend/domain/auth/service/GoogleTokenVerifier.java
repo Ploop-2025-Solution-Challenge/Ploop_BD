@@ -12,6 +12,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 
 
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,10 +29,13 @@ public class GoogleTokenVerifier {
     }
 
     public GoogleUserDto verify(String idTokenString) {
+        System.out.println("!!!! Received ID token: " + idTokenString);
+
         try {
             List<String> clientIds = googleProperties.getClientIds();
+            System.out.println("!!!! Allowed clientIds: " + clientIds);
 
-            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder( // ID 토큰 검증기 생성
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
                     GoogleNetHttpTransport.newTrustedTransport(),
                     JacksonFactory.getDefaultInstance())
                     .setAudience(clientIds)
@@ -39,8 +43,23 @@ public class GoogleTokenVerifier {
 
             GoogleIdToken idToken = verifier.verify(idTokenString);
 
-            if (idToken == null) throw new RuntimeException("Invalid ID token"); // ID 토큰 검증, idTokenString(클라이언트에서 받은 ID 토큰)을 실제 Google API에 보내서 검증
-            GoogleIdToken.Payload payload = idToken.getPayload(); // 토큰 유효시 payload에 들어 있는 사용자 정보 가져오기
+            String[] parts = idTokenString.split("\\.");
+            if (parts.length == 3) {
+                String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]));
+                System.out.println("🧾 Decoded payload = " + payloadJson);
+            }
+
+            if (idToken == null) {
+                System.err.println("!!!! ID token is null — failed verification.");
+                throw new RuntimeException("Invalid ID token");
+            }
+
+            GoogleIdToken.Payload payload = idToken.getPayload();
+
+            System.out.println("!!!! Token verified successfully");
+            System.out.println("   - email: " + payload.getEmail());
+            System.out.println("   - aud: " + payload.getAudience());
+            System.out.println("   - azp: " + payload.getAuthorizedParty());
 
             return new GoogleUserDto(
                     payload.getSubject(),
@@ -49,7 +68,10 @@ public class GoogleTokenVerifier {
                     (String) payload.get("picture")
             );
         } catch (Exception e) {
+            System.err.println("!!!! Exception during ID token verification: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Failed to verify Google ID token", e);
         }
     }
+
 }
