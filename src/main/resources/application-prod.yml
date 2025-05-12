@@ -16,7 +16,7 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://172.17.0.1:3306/ploop # ploop or ploop_db
-    username: plogger # root or plogger
+    username: root # root or plogger
   data:
     redis:
       host: 172.17.0.1
