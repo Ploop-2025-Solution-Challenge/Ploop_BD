@@ -22,27 +22,6 @@ public class GeminiService {
             .baseUrl("https://generativelanguage.googleapis.com")
             .build();
 
-    /*public String generateMotivation() {
-        String prompt = "Give me a short motivational sentence for someone who is out plogging (jogging while picking up trash). Keep it under 20 words.";
-
-        try {
-            GeminiRequest request = new GeminiRequest(prompt);
-
-            GeminiResponse response = webClient.post()
-                    .uri(uriBuilder -> uriBuilder
-                        .path("/v1beta/models/gemini-2.0-flash:generateContent")
-                        .queryParam("key", apiKey).build())
-                    .header("Content-Type", "application/json") // Google Gemini API 는 header 설정 필요
-                    .bodyValue(request)
-                    .retrieve()
-                    .bodyToMono(GeminiResponse.class)
-                    .block();
-
-            return response.getText();
-        } catch (Exception e) {
-            return "error "; //Keep going strong! You're cleaning the world, one step at a time.🌍
-        }
-    }*/
 
     public String generateMotivation() {
         String prompt = "Give me a short motivational sentence for someone who is out plogging (jogging while picking up trash). Keep it under 20 words.";
@@ -50,7 +29,7 @@ public class GeminiService {
         try {
             GeminiRequest request = new GeminiRequest(prompt);
 
-            log.info("📤 Gemini 요청: {}", request); // 요청 로그
+            log.info("!!!! Gemini 요청: {}", request); // 요청 로그
 
             GeminiResponse response = webClient.post()
                     .uri(uriBuilder -> uriBuilder
@@ -60,18 +39,18 @@ public class GeminiService {
                     .bodyValue(request)
                     .retrieve()
                     .onStatus(status -> status.isError(), clientResponse -> {
-                        log.error("❌ Gemini 응답 에러 상태: {}", clientResponse.statusCode());
+                        log.error("!!!! Gemini 응답 에러 상태: {}", clientResponse.statusCode());
                         return clientResponse.createException();
                     })
                     .bodyToMono(GeminiResponse.class)
-                    .doOnNext(r -> log.info("✅ Gemini 응답 수신: {}", r.getText()))
-                    .doOnError(e -> log.error("❌ Gemini 처리 중 예외 발생", e))
+                    .doOnNext(r -> log.info("!!!! Gemini 응답 수신: {}", r.getText()))
+                    .doOnError(e -> log.error("!!!! Gemini 처리 중 예외 발생", e))
                     .block();
 
             String result = response != null ? response.getText() : null;
-            log.info("📥 Gemini 응답 수신: {}", result);
+            log.info("!!!! Gemini 응답 수신: {}", result);
 
-            // 👉 줄바꿈 문자 제거
+            //  줄바꿈 문자 제거
             return result != null ? result.replace("\n", " ").trim() : prompt;
 
 

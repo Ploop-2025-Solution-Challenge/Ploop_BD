@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -25,6 +24,7 @@ public class TeamMissionService {
     private final TeamMissionRepository teamMissionRepository;
     private final UserMissionRepository userMissionRepository;
 
+    // 팀 미션 랜덤으로 저장
     @Transactional
     public void assignRandomMissionsToTeam(Team team) {
         User user1 = team.getUser1();

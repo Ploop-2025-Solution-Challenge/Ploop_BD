@@ -13,7 +13,5 @@ public interface UserMissionRepository extends JpaRepository<UserMission, Long> 
 
     // 특정 유저가 일정 기간 동안 인증 완료한 미션 개수
     int countByUserAndIsVerifiedTrueAndCreatedAtBetween(User user, LocalDateTime start, LocalDateTime end);
-
-    List<UserMission> findAllByTeamMission(TeamMission teamMission);
 }
 

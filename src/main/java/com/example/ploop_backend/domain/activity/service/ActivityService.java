@@ -2,6 +2,7 @@ package com.example.ploop_backend.domain.activity.service;
 
 import com.example.ploop_backend.domain.activity.dto.ActivityStatsResponseDto;
 import com.example.ploop_backend.domain.activity.dto.GraphDataDto;
+import com.example.ploop_backend.domain.mission.repository.UserMissionHistoryRepository;
 import com.example.ploop_backend.domain.mission.repository.UserMissionRepository;
 import com.example.ploop_backend.domain.plogging.entity.Route;
 import com.example.ploop_backend.domain.plogging.repository.RouteRepository;
@@ -21,6 +22,7 @@ public class ActivityService {
 
     private final RouteRepository routeRepository;
     private final UserMissionRepository userMissionRepository;
+    private final UserMissionHistoryRepository userMissionHistoryRepository;
 
     public ActivityStatsResponseDto getActivityStats(String range, LocalDate startDate, LocalDate endDate, User user) {
         // range=Y인 경우 날짜 보정
@@ -54,7 +56,7 @@ public class ActivityService {
         }
 
         // UserMission 테이블에서 기간 내 해당 유저가 isVerified가 true인 미션 개수 조회
-        int challengeCompleted = userMissionRepository.countByUserAndIsVerifiedTrueAndCreatedAtBetween(
+        int challengeCompleted = userMissionHistoryRepository.countByUserAndIsVerifiedTrueAndCreatedAtBetween(
                 user, startDate.atStartOfDay(), endDate.atTime(23, 59));
 
 
