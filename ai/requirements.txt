@@ -5,5 +5,5 @@ python-multipart
 opencv-python-headless
 ultralytics
 scikit-learn
-googlemaps
+googlemaps 
 gmaps
