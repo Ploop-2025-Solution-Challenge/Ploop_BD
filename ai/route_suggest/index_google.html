@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>Google Maps Trash Routing Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial,
+          sans-serif;
+      }
+      #controls {
+        padding: 12px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+      }
+      #map {
+        width: 100vw;
+        height: calc(100vh - 64px);
+      }
+      button {
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        background: #fff;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #f7f7f7;
+      }
+      .badge {
+        font-size: 12px;
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: #eee;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      input[type="file"] {
+        display: none;
+      }
+      label.file-btn {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        cursor: pointer;
+        background: #fff;
+      }
+      .status {
+        font-size: 13px;
+        color: #555;
+      }
+    </style>
+    <!-- ✅ 본인 Google Maps JavaScript API 키 -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=KEY...&libraries=marker"></script>
+  </head>
+  <body>
+    <div id="controls">
+      <div class="row">
+        <label class="file-btn" for="fileInput">JSON 불러오기</label>
+        <input id="fileInput" type="file" accept="application/json" />
+        <button id="loadSample">샘플 불러오기(temp_trash_data.json)</button>
+        <button id="requestRoute" disabled>Route 요청</button>
+        <span class="badge" id="pointCount">-</span>
+        <span class="status" id="statusMsg">파일을 불러오세요.</span>
+      </div>
+    </div>
+    <div id="map"></div>
+
+    <script>
+      let map,
+        currentMarker,
+        destMarker,
+        trashMarkers = [],
+        binMarkers = [],
+        waypointMarkers = []; // ✅ 보라색 waypoint 마커 관리
+      let loadedData = null;
+      let routePolyline = null;
+      let fallbackPolyline = null;
+
+      function addMarker(position, labelText, color) {
+        const marker = new google.maps.marker.AdvancedMarkerElement({
+          map,
+          position,
+          content: (() => {
+            const el = document.createElement("div");
+            el.style.background = color;
+            el.style.color = "#fff";
+            el.style.padding = "4px 6px";
+            el.style.borderRadius = "6px";
+            el.style.fontSize = "12px";
+            el.style.boxShadow = "0 1px 4px rgba(0,0,0,.25)";
+            el.textContent = labelText;
+            return el;
+          })(),
+        });
+        return marker;
+      }
+
+      function decodePolyline(encoded) {
+        let index = 0,
+          len = encoded.length;
+        let lat = 0,
+          lng = 0,
+          coordinates = [];
+        while (index < len) {
+          let result = 0,
+            shift = 0,
+            b;
+          do {
+            b = encoded.charCodeAt(index++) - 63;
+            result |= (b & 0x1f) << shift;
+            shift += 5;
+          } while (b >= 0x20);
+          const dlat = result & 1 ? ~(result >> 1) : result >> 1;
+          lat += dlat;
+          result = 0;
+          shift = 0;
+          do {
+            b = encoded.charCodeAt(index++) - 63;
+            result |= (b & 0x1f) << shift;
+            shift += 5;
+          } while (b >= 0x20);
+          const dlng = result & 1 ? ~(result >> 1) : result >> 1;
+          lng += dlng;
+          coordinates.push({ lat: lat / 1e5, lng: lng / 1e5 });
+        }
+        return coordinates;
+      }
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: 37.626, lng: 127.078 },
+          zoom: 14,
+          mapId: "trash-route-map",
+        });
+      }
+
+      function clearPolylines() {
+        if (routePolyline) {
+          routePolyline.setMap(null);
+          routePolyline = null;
+        }
+        if (fallbackPolyline) {
+          fallbackPolyline.setMap(null);
+          fallbackPolyline = null;
+        }
+      }
+
+      function clearWaypointMarkers() {
+        waypointMarkers.forEach((m) => (m.map = null));
+        waypointMarkers = [];
+      }
+
+      function renderAll(data) {
+        if (currentMarker) currentMarker.map = null;
+        if (destMarker) destMarker.map = null;
+        trashMarkers.forEach((m) => (m.map = null));
+        binMarkers.forEach((m) => (m.map = null));
+        clearWaypointMarkers();
+        trashMarkers = [];
+        binMarkers = [];
+        clearPolylines();
+
+        const { current, destination, trash = [], bins = [] } = data;
+        if (current)
+          currentMarker = addMarker(
+            { lat: current.lat, lng: current.lng },
+            "현재",
+            "#10b981"
+          );
+        if (destination)
+          destMarker = addMarker(
+            { lat: destination.lat, lng: destination.lng },
+            "목적지",
+            "#111827"
+          );
+        trash.forEach((t) =>
+          trashMarkers.push(
+            addMarker({ lat: t.lat, lng: t.lng }, t.id || "T", "#ef4444")
+          )
+        );
+        bins.forEach((b) =>
+          binMarkers.push(
+            addMarker({ lat: b.lat, lng: b.lng }, b.id || "B", "#3b82f6")
+          )
+        );
+
+        const bounds = new google.maps.LatLngBounds();
+        if (current)
+          bounds.extend(new google.maps.LatLng(current.lat, current.lng));
+        if (destination)
+          bounds.extend(
+            new google.maps.LatLng(destination.lat, destination.lng)
+          );
+        [...trash, ...bins].forEach((p) =>
+          bounds.extend(new google.maps.LatLng(p.lat, p.lng))
+        );
+        if (!bounds.isEmpty()) map.fitBounds(bounds);
+
+        document.getElementById(
+          "pointCount"
+        ).textContent = `trash:${trash.length} / bins:${bins.length}`;
+        document.getElementById("statusMsg").textContent =
+          "지도를 업데이트했습니다.";
+        document.getElementById("requestRoute").disabled =
+          !current || !destination || trash.length === 0;
+      }
+
+      // ✅ 서버 응답 처리 (성공/실패 모두 waypoint 보라색 표시)
+      function drawRouteFromServer(responseJson) {
+        clearPolylines();
+        clearWaypointMarkers();
+
+        const success = !!responseJson?.success;
+        const waypoints = responseJson?.waypoints || [];
+        const cur = loadedData?.current;
+        const dest = loadedData?.destination;
+
+        if (success && responseJson?.route?.encodedPolyline) {
+          const coords = decodePolyline(responseJson.route.encodedPolyline);
+          routePolyline = new google.maps.Polyline({
+            path: coords,
+            geodesic: true,
+            strokeOpacity: 0.9,
+            strokeWeight: 5,
+          });
+          routePolyline.setMap(map);
+
+          // ✅ waypoint 보라색 마커 표시
+          waypoints.forEach((w, idx) => {
+            waypointMarkers.push(
+              addMarker({ lat: w.lat, lng: w.lng }, `W${idx + 1}`, "#9333ea")
+            );
+          });
+
+          document.getElementById(
+            "statusMsg"
+          ).textContent = `경로 수신(정식): ${coords.length} 포인트, waypoint ${waypoints.length}개`;
+          return;
+        }
+
+        // ❌ 실패 → fallback
+        if (!cur || !dest) {
+          document.getElementById("statusMsg").textContent =
+            "fallback 실패: current/destination 없음";
+          return;
+        }
+        const path = [
+          { lat: cur.lat, lng: cur.lng },
+          ...waypoints.map((w) => ({ lat: w.lat, lng: w.lng })),
+          { lat: dest.lat, lng: dest.lng },
+        ];
+        fallbackPolyline = new google.maps.Polyline({
+          path,
+          geodesic: true,
+          strokeOpacity: 0.6,
+          strokeWeight: 4,
+          strokeColor: "#9333ea",
+        });
+        fallbackPolyline.setMap(map);
+
+        // ✅ 실패 시에도 waypoint 보라색 마커 표시
+        waypoints.forEach((w, idx) => {
+          waypointMarkers.push(
+            addMarker({ lat: w.lat, lng: w.lng }, `W${idx + 1}`, "#9333ea")
+          );
+        });
+
+        document.getElementById(
+          "statusMsg"
+        ).textContent = `경로 수신 실패 → 직선 fallback 표시 (waypoint ${waypoints.length}개)`;
+      }
+
+      document
+        .getElementById("fileInput")
+        .addEventListener("change", async (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          try {
+            const text = await file.text();
+            loadedData = JSON.parse(text);
+            renderAll(loadedData);
+          } catch (err) {
+            console.error(err);
+            document.getElementById("statusMsg").textContent = "JSON 파싱 실패";
+          }
+        });
+
+      document
+        .getElementById("loadSample")
+        .addEventListener("click", async () => {
+          try {
+            const resp = await fetch("./temp_trash_data_korea.json", {
+              cache: "no-cache",
+            });
+            loadedData = await resp.json();
+            renderAll(loadedData);
+          } catch (err) {
+            console.error(err);
+            document.getElementById("statusMsg").textContent = "샘플 로드 실패";
+          }
+        });
+
+      document
+        .getElementById("requestRoute")
+        .addEventListener("click", async () => {
+          if (!loadedData) return;
+          document.getElementById("statusMsg").textContent =
+            "서버에 경로를 요청 중...";
+          try {
+            const resp = await fetch("http://127.0.0.1:8000/route/compute", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(loadedData),
+            });
+            if (!resp.ok) {
+              const t = await resp.text();
+              throw new Error(`HTTP ${resp.status}: ${t}`);
+            }
+            const result = await resp.json();
+            drawRouteFromServer(result);
+          } catch (err) {
+            console.error(err);
+            document.getElementById("statusMsg").textContent =
+              "경로 요청 실패: " + err.message;
+          }
+        });
+
+      window.onload = initMap;
+    </script>
+  </body>
+</html>
