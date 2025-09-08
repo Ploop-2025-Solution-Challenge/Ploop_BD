@@ -11,7 +11,7 @@ spring:
       client:
         registration:
           google:
-            redirect-uri: https://api.ploop.store/auth/google/redirect
+            redirect-uri: https://api.ploop.shop/auth/google/redirect
   lifecycle:
     timeout-per-shutdown-phase: 1h
   datasource:
