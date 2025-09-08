@@ -1,5 +1,6 @@
 server:
-  shutdown: graceful
+  port: 8080
+  shutdown: graceful # 천천히 종료
 spring:
   config:
     import: "application-secret.yml"
@@ -21,6 +22,7 @@ spring:
     redis:
       host: 172.17.0.1
       port: 6379
+      #password: ${custom.secret.spring.data.redis.password}
   jpa:
     hibernate:
       ddl-auto: update

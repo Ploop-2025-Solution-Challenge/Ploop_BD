@@ -14,6 +14,6 @@ public class HomeController {
     public String home() {
         System.out.println("🔥 [로그] / 요청됨");
 
-        return "서버 잘 돌아가고 있어요!";
+        return "[Ploop] 서버 잘 돌아가고 있어요!!!!";
     }
 }
