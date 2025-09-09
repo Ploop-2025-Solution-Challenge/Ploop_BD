@@ -83,7 +83,7 @@ public class TrashBinService {
 
         s3Client.putObject(putObjectRequest,
                 RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
-        String fileUrl = "https://image.ploop.store/" + fileKey;
+        String fileUrl = "https://image.ploop.shop/" + fileKey;
 
         return fileUrl;
     }

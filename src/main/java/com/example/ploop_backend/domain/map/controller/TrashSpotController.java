@@ -30,7 +30,7 @@ public class TrashSpotController {
             @RequestParam("latitude") double latitude,
             @RequestParam("longitude") double longitude
     ) {
-        System.out.println("🔥🔥🔥🔥🔥 TrashSpot 컨트롤러 도달함");
+        System.out.println("🔥🔥🔥🔥🔥 TrashSpot POST 컨트롤러 도달함");
         try {
             TrashSpot spot = trashSpotService.registerTrashSpot(user, image, latitude, longitude);
 

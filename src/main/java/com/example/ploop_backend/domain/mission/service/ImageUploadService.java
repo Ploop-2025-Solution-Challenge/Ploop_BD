@@ -41,6 +41,6 @@ public class ImageUploadService {
 
         s3Client.putObject(putObjectRequest,
                 RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
-        return "https://image.ploop.store/" + fileKey;
+        return "https://image.ploop.shop/" + fileKey;
     }
 }
