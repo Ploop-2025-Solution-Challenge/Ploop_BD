@@ -37,8 +37,7 @@ public class AuthController {
     private final AuthService authService;
     private final RestTemplate restTemplate;
 
-    private final ObjectMapper objectMapper;
-
+    // 백엔드 테스트용 로그인 api 재설정
     @GetMapping("/api/auth/login/google")
     public void googleLogin(
             HttpServletResponse response) throws IOException {
