@@ -73,6 +73,7 @@ public class TrashSpotService {
         s3Client.putObject(putObjectRequest,
                 RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
+        // R2 URL ploop.store -> shop으로 변경
         return "https://image.ploop.shop/" + fileKey;
     }
 }
