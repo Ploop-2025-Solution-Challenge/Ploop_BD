@@ -1,38 +1,25 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
-FastAPI 서버
-- 요청으로 받은 temp_trash_data.json 형식(payload)을 그대로 보존하고,
-  success, message, waypoints, (성공 시) route 를 "추가"해서 응답.
-- destination 미제공 시:
-    * bins가 1개 이상이면 현재 위치에서 가장 가까운 bin을 destination으로 설정
-    * bins가 존재하지 않으면 현재 위치를 destination으로 설정
-- 파일 저장 없음. 콘솔에 응답 payload를 print.
+google_route.py
+- 거리 계산, K-Means, 웨이포인트 선정, 목적지 자동설정, Google Routes API 호출,
+  응답 머지/프린트 등 비즈니스 로직 전부 담당
+- app.py는 엔드포인트(통신)만 담당
 """
 
-import os, math, json
+import os
+import math
+import json
 from typing import List, Dict, Any, Tuple
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
 import requests
 import numpy as np
+from fastapi.responses import JSONResponse
 
 # ===== 설정 =====
-GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", "KEY...")
+GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", "KEY")
 ROUTES_URL = "https://routes.googleapis.com/directions/v2:computeRoutes"
 FIELD_MASK = "routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline"
 
-app = FastAPI(title="Trash Routing Server", version="1.4.0")
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # 개발 편의. 배포 시 도메인 제한 권장
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # ===== 유틸리티 =====
 def haversine(lat1, lng1, lat2, lng2) -> float:
@@ -101,15 +88,8 @@ def choose_nearest_real_points_to_centroids(
 def sort_waypoints_by_distance_from_current(waypoints: List[Dict[str, float]], current: Dict[str, float]) -> List[Dict[str, float]]:
     return sorted(waypoints, key=lambda w: haversine(current["lat"], current["lng"], w["lat"], w["lng"]))
 
-def respond_merged(original_payload: Dict[str, Any], additions: Dict[str, Any]) -> JSONResponse:
-    """
-    원본 payload 구조를 보존하면서 fields를 추가하여 반환.
-    콘솔에 prettified JSON을 출력.
-    """
-    merged = dict(original_payload)  # shallow copy
-    for k, v in additions.items():
-        merged[k] = v
-
+def _print_response_payload(merged: Dict[str, Any]) -> None:
+    """콘솔에 prettified JSON 출력 (파일 저장 없음)"""
     print("\n=== Response to frontend (merged) ===")
     try:
         print(json.dumps(merged, ensure_ascii=False, indent=2))
@@ -117,30 +97,28 @@ def respond_merged(original_payload: Dict[str, Any], additions: Dict[str, Any]) 
         print(str(merged))
     print("=== End of response ===\n")
 
-    return JSONResponse(merged, status_code=200)
-
-# ===== 엔드포인트 =====
-@app.post("/route/compute")
-async def compute_route(req: Request):
+def respond_merged(original_payload: Dict[str, Any], additions: Dict[str, Any], status_code: int = 200) -> JSONResponse:
     """
-    입력: temp_trash_data.json 포맷
-    처리:
-      - destination 미제공 시:
-          · bins가 2개 이상 → 현재 위치에서 가장 가까운 bin을 destination으로 설정
-          · bins가 1개 이하 → 현재 위치를 destination으로 설정
-      - (1) trash 수 < 3 → K-Means 생략, 실제 trash 좌표 전체를 waypoint로 사용
-      - (2) trash 수 ≥ 3 → K=3 K-Means 후, 각 centroid에 가장 가까운 '실제' 쓰레기 좌표를 waypoint로 채택(중복 방지)
-      - (3) waypoints를 current와의 거리 오름차순으로 정렬
-      - (4) Routes API 호출(실패해도 success:false로 200 응답)
-    응답: 요청 payload에 다음 필드를 "추가"하여 반환
-         { success: bool, message?: str, waypoints: [...], route?: {...} }
+    원본 payload 구조를 보존하면서 fields를 추가하여 반환.
     """
-    # --- 입력 파싱 ---
-    try:
-        payload = await req.json()
-    except Exception:
-        return respond_merged({}, {"success": False, "message": "Invalid JSON", "waypoints": []})
+    merged = dict(original_payload)  # shallow copy
+    for k, v in additions.items():
+        merged[k] = v
+    _print_response_payload(merged)
+    return JSONResponse(merged, status_code=status_code)
 
+def invalid_json_response() -> JSONResponse:
+    """app.py에서 JSON 파싱 실패 시 통일된 응답"""
+    return respond_merged({}, {"success": False, "message": "Invalid JSON", "waypoints": []})
+
+
+# ===== 메인 로직 =====
+def handle_compute(payload: Dict[str, Any]) -> JSONResponse:
+    """
+    app.py의 엔드포인트에서 호출.
+    입력: temp_trash_data.json 포맷의 payload(dict)
+    처리/응답 형식은 기존과 동일.
+    """
     current = payload.get("current")
     destination = payload.get("destination")
     trash = payload.get("trash", [])
@@ -155,8 +133,8 @@ async def compute_route(req: Request):
         })
 
     # 목적지 자동 보정 로직
+    auto_msg = None
     if not destination:
-        auto_msg = None
         # bins가 1개 이상이면 현재 위치에서 가장 가까운 bin을 목적지로
         if isinstance(bins, list) and len(bins) >= 1:
             def _dist_bin(b):
@@ -173,11 +151,9 @@ async def compute_route(req: Request):
             destination = {"lat": float(current["lat"]), "lng": float(current["lng"])}
             payload["destination"] = destination
             auto_msg = "destination이 없어 현재 위치를 목적지로 설정"
-        # 참고 메시지는 최종 message에 덧붙일 수 있음 (아래에서 처리)
 
     # trash 최소 1개 필요
     if not (trash and len(trash) >= 1):
-        # 위에서 destination을 주입했을 수 있으니 payload는 그대로 반환
         return respond_merged(payload, {
             "success": False,
             "message": "trash(>=1) 필요",
@@ -209,8 +185,7 @@ async def compute_route(req: Request):
     # (4) Routes API 호출 (한국/키 문제 등 실패 시 success:false)
     if not GOOGLE_MAPS_API_KEY or GOOGLE_MAPS_API_KEY in {"YOUR_GOOGLE_API_KEY"}:
         msg = "GOOGLE_MAPS_API_KEY 미설정 또는 한국 지역 제한"
-        # destination 자동 설정 메시지 부가
-        if not payload.get("message") and 'auto_msg' in locals() and auto_msg:
+        if auto_msg:
             msg = f"{msg} · {auto_msg}"
         return respond_merged(payload, {
             "success": False,
@@ -229,7 +204,7 @@ async def compute_route(req: Request):
         r = requests.post(ROUTES_URL, headers=headers, json=routes_req, timeout=20)
         if r.status_code != 200:
             msg = f"Routes API HTTP {r.status_code}"
-            if 'auto_msg' in locals() and auto_msg:
+            if auto_msg:
                 msg = f"{msg} · {auto_msg}"
             return respond_merged(payload, {
                 "success": False,
@@ -242,7 +217,7 @@ async def compute_route(req: Request):
         routes = data.get("routes", [])
         if not routes:
             msg = "Routes API가 경로를 반환하지 않음"
-            if 'auto_msg' in locals() and auto_msg:
+            if auto_msg:
                 msg = f"{msg} · {auto_msg}"
             return respond_merged(payload, {
                 "success": False,
@@ -254,7 +229,7 @@ async def compute_route(req: Request):
         encoded = route0.get("polyline", {}).get("encodedPolyline")
         if not encoded:
             msg = "encoded polyline 없음"
-            if 'auto_msg' in locals() and auto_msg:
+            if auto_msg:
                 msg = f"{msg} · {auto_msg}"
             return respond_merged(payload, {
                 "success": False,
@@ -263,7 +238,7 @@ async def compute_route(req: Request):
             })
 
         msg = "ok"
-        if 'auto_msg' in locals() and auto_msg:
+        if auto_msg:
             msg = f"{msg} · {auto_msg}"
 
         return respond_merged(payload, {
@@ -279,7 +254,7 @@ async def compute_route(req: Request):
 
     except requests.RequestException as e:
         msg = "Routes API 요청 실패"
-        if 'auto_msg' in locals() and auto_msg:
+        if auto_msg:
             msg = f"{msg} · {auto_msg}"
         return respond_merged(payload, {
             "success": False,
@@ -287,8 +262,3 @@ async def compute_route(req: Request):
             "detail": str(e),
             "waypoints": waypoints
         })
-
-
-if __name__ == "__main__":
-    # uvicorn google_map_server:app --reload --port 8000
-    uvicorn.run("google_map_server:app", host="0.0.0.0", port=8000, reload=True)
