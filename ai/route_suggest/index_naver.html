@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>NAVER Map + KMeans Waypoints</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- (중요) Client ID로 교체하세요 -->
+    <script
+      type="text/javascript"
+      src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=KEY"
+    ></script>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      }
+      #map {
+        width: 100vw;
+        height: 85vh;
+      }
+      .toolbar {
+        padding: 10px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .legend {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        font-size: 14px;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+      }
+      .blue {
+        background: #2979ff;
+      }
+      .red {
+        background: #ff1744;
+      }
+      .gray {
+        background: #616161;
+      }
+      .green {
+        background: #2e7d32;
+      }
+      .purple {
+        background: #8e24aa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toolbar">
+      <button id="reqBtn">request</button>
+      <div class="legend">
+        <span><span class="dot blue"></span>현재</span>
+        <span><span class="dot red"></span>목표</span>
+        <span><span class="dot gray"></span>쓰레기</span>
+        <span><span class="dot green"></span>쓰레기통</span>
+        <span><span class="dot purple"></span>Waypoints(중심점)</span>
+      </div>
+    </div>
+    <div id="map"></div>
+
+    <script>
+      const API_BASE = "http://localhost:8080"; // 서버 주소
+      const SEOULTECH_CENTER = new naver.maps.LatLng(37.63237, 127.07919);
+
+      let map;
+      let dataCache = null; // temp_trash_data.json 캐시
+      let waypointMarkers = []; // 보라색 중심점 마커 모음
+
+      const colors = {
+        current: "#2979ff",
+        destination: "#ff1744",
+        trash: "#616161",
+        bin: "#2e7d32",
+        waypoint: "#8e24aa", // 보라색
+      };
+
+      function makeMarker({ lat, lng }, color, title) {
+        return new naver.maps.Marker({
+          position: new naver.maps.LatLng(lat, lng),
+          map,
+          title,
+          icon: {
+            content: `<div style="width:12px;height:12px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.2)"></div>`,
+          },
+        });
+      }
+
+      async function init() {
+        map = new naver.maps.Map("map", {
+          center: SEOULTECH_CENTER,
+          zoom: 15,
+          mapTypeControl: true,
+        });
+
+        // 1) 로컬 JSON 로딩 및 기본 마커 표시
+        dataCache = await fetch("temp_trash_data.json").then((r) => r.json());
+
+        if (dataCache.current)
+          makeMarker(dataCache.current, colors.current, "현재 위치");
+        if (dataCache.destination)
+          makeMarker(dataCache.destination, colors.destination, "목표 위치");
+        (dataCache.trash || []).forEach((p, i) =>
+          makeMarker(p, colors.trash, `쓰레기 #${i + 1}`)
+        );
+        (dataCache.bins || []).forEach((p, i) =>
+          makeMarker(p, colors.bin, `쓰레기통 #${i + 1}`)
+        );
+
+        // 2) 버튼 클릭 → 서버로 temp_trash_data.json 그대로 전달
+        document
+          .getElementById("reqBtn")
+          .addEventListener("click", async () => {
+            // 기존 waypoint 마커 제거
+            waypointMarkers.forEach((m) => m.setMap(null));
+            waypointMarkers = [];
+
+            try {
+              const res = await fetch(`${API_BASE}/waypoints?k=3`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dataCache), // ★ 로컬에서 읽은 JSON 전체를 서버로 전송
+              });
+
+              if (!res.ok) {
+                const t = await res.text();
+                alert("waypoints 요청 실패: " + t);
+                return;
+              }
+
+              const payload = await res.json(); // { waypoints: [[lng,lat], ...], k: 3, ... }
+              if (!payload.waypoints || !Array.isArray(payload.waypoints)) {
+                alert("응답 포맷 오류: waypoints가 없습니다.");
+                return;
+              }
+
+              // 3) 보라색 중심점 마커 표시
+              const bounds = new naver.maps.LatLngBounds();
+              payload.waypoints.forEach((w, idx) => {
+                const [lng, lat] = w;
+                const mk = makeMarker(
+                  { lat, lng },
+                  colors.waypoint,
+                  `Waypoint #${idx + 1}`
+                );
+                waypointMarkers.push(mk);
+                bounds.extend(new naver.maps.LatLng(lat, lng));
+              });
+              if (payload.waypoints.length > 0) map.fitBounds(bounds);
+            } catch (err) {
+              alert("요청 중 오류: " + err.message);
+            }
+          });
+      }
+
+      window.addEventListener("load", init);
+    </script>
+  </body>
+</html>
