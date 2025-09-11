@@ -8,3 +8,4 @@ scikit-learn
 googlemaps 
 gmaps
 polyline
+transformers
