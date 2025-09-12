@@ -26,11 +26,11 @@ public class UserService {
         user.setRegion(req.getRegion());
 
         // 프론트에서 받아온 문자열 → Enum 변환
-        Gender gender = Gender.fromLabel(req.getGender());
-        Difficulty difficulty = Difficulty.fromLabel(req.getDifficulty());
-        Motivation motivation = Motivation.fromLabel(req.getMotivation());
+        Gender gender = Gender.valueOf(req.getGender());
+        Difficulty difficulty = Difficulty.valueOf(req.getDifficulty());
+        Motivation motivation = Motivation.valueOf(req.getMotivation());
         List<PreferredArea> preferredArea = req.getPreferredArea().stream()
-                .map(PreferredArea::fromLabel)
+                .map(PreferredArea::valueOf)
                 .collect(Collectors.toList());
 
         user.setGender(gender); // 추가된 필드 (enum 타입)
