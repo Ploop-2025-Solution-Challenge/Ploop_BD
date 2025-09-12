@@ -31,7 +31,7 @@ public class MissionController {
     private final ImageUploadService imageUploadService;
     private final MissionVerificationService missionVerificationService;
 
-    // 유저의 전체 미션 조회 (3개)
+    // 유저의 전체 미션 조회 (3개) -> 백 확인용
     @GetMapping
     public ResponseEntity<Map<String, Object>> getMyMissions(@AuthenticationPrincipal User user) {
         List<UserMission> missions = userMissionRepository.findAllByUser(user);
@@ -55,7 +55,7 @@ public class MissionController {
         ));
     }
 
-    // 유저의 특정 미션 조회
+    // 유저의 특정 미션 조회 -> 백 확인용
     @GetMapping("/{userMissionId}")
     public ResponseEntity<UserMissionResponseDto> getMissionDetail(@PathVariable("userMissionId") Long userMissionId) {
         UserMission mission = userMissionRepository.findById(userMissionId).orElseThrow();
@@ -88,7 +88,8 @@ public class MissionController {
                 .filter(m -> m.getTeamMission() != null && m.getTeamMission().getMission() != null)
                 .map(m -> MissionSimpleDto.builder()
                         .userMissionId(m.getId())
-                        .name(m.getTeamMission().getMission().getName())
+                        .requiredCount(m.getTeamMission().getMission().getRequiredCount())
+                        .category(String.valueOf(m.getTeamMission().getMission().getCategory()))
                         .isVerified(Boolean.TRUE.equals(m.getIsVerified()))
                         .build()
                 )
@@ -99,7 +100,8 @@ public class MissionController {
                 .filter(m -> m.getTeamMission() != null && m.getTeamMission().getMission() != null)
                 .map(m -> MissionSimpleDto.builder()
                         .userMissionId(m.getId())
-                        .name(m.getTeamMission().getMission().getName())
+                        .requiredCount(m.getTeamMission().getMission().getRequiredCount())
+                        .category(String.valueOf(m.getTeamMission().getMission().getCategory()))
                         .isVerified(Boolean.TRUE.equals(m.getIsVerified()))
                         .build()
                 )
