@@ -14,9 +14,10 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+// plogging 기록 저장, 조회, 삭제
 @Service
 @RequiredArgsConstructor
-public class RouteService {
+public class PloggingRouteService {
 
     private final RouteRepository routeRepository;
     private final ObjectMapper objectMapper; // 좌표리스트 -> JSON 문자열로 변환

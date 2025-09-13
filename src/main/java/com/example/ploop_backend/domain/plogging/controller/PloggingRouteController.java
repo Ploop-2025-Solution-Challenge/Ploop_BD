@@ -1,7 +1,7 @@
 package com.example.ploop_backend.domain.plogging.controller;
 
 import com.example.ploop_backend.dto.plogging.RouteRequestDto;
-import com.example.ploop_backend.domain.plogging.service.RouteService;
+import com.example.ploop_backend.domain.plogging.service.PloggingRouteService;
 import com.example.ploop_backend.dto.plogging.RouteResponseDto;
 import com.example.ploop_backend.dto.plogging.RouteSummaryDto;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +12,9 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/plogging")
-public class RouteController {
+public class PloggingRouteController {
 
-    private final RouteService routeService;
+    private final PloggingRouteService routeService;
 
     @PostMapping("/end")
     public Long saveRoute(@RequestBody RouteRequestDto dto) throws Exception {
