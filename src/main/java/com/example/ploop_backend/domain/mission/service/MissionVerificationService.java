@@ -22,19 +22,21 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class MissionVerificationService {
 
     private final WebClient webClient = WebClient.builder()
-            .baseUrl("http://35.224.212.56:8000")
+            .baseUrl("http://ai-서버:8000")
             .build();
 
     private final MissionVerificationRepository verificationRepository;
     private final UserMissionRepository userMissionRepository;
 
     public Map<String, Object> verifyMission(MultipartFile file, Long userMissionId, User user) throws IOException {
+        // 1) 유저의 미션 조회 / 권한 체크
         // 받은 userMissionId로 UserMission 조회
         UserMission userMission = userMissionRepository.findById(userMissionId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 유저 미션입니다."));
@@ -42,6 +44,7 @@ public class MissionVerificationService {
             throw new SecurityException("해당 미션에 대한 권한이 없습니다.");
         }
 
+        // 2) 미션 요구사항
         // 해당 미션 정보 조회
         Mission mission = userMission.getMission();
         // 미션의 검증 조건 가져오기
@@ -49,7 +52,7 @@ public class MissionVerificationService {
         int requiredCount = mission.getRequiredCount();       // ex: 3
 
 
-        // AI 서버에 이미지 전송
+        // 3) AI 서버에 이미지 전송
         ByteArrayResource resource = new ByteArrayResource(file.getBytes()) {
             @Override
             public String getFilename() {
@@ -58,51 +61,89 @@ public class MissionVerificationService {
         };
 
         String jsonResponse = webClient.post()
-                .uri("/detect/upload")
+                .uri("/detect")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData("file", resource))
                 .retrieve()
                 .bodyToMono(String.class) // JSON 응답을 String으로 받음
                 .block();
 
-        // AI 응답 결과 파싱
+        // 4) AI 응답 결과 파싱 -> 응답 구조가 바뀜
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(jsonResponse);
-        JsonNode objects = root.path("detection_results").path("objects");
+        JsonNode resultsNode = root.path("results");
 
-        //  감지된 쓰레기 class 집계
+        if (resultsNode.isMissingNode() || !resultsNode.isObject()) {
+            throw new RuntimeException("감지된 쓰레기가 없습니다. (results 없음)");
+        }
+
+        //  감지된 쓰레기 class 개수 집계
         Map<Category, Integer> detected = new HashMap<>();
-        for (JsonNode obj : objects) {
-            String className = obj.path("class").asText();
-            Category category = Category.mapClassNameToCategory(className);
-            if (category != null) {
-                detected.put(category, detected.getOrDefault(category, 0) + 1);
+        int totalCount = 0; // 전체 감지된 쓰레기 개수
+
+        // AI 서버가 반환한 각 객체의 class를 내부 카테고리(enum)로 매핑하여 집계
+        Iterator<Map.Entry<String, JsonNode>> fields = resultsNode.fields(); //
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> entry = fields.next();
+            String key = entry.getKey();
+            int count = entry.getValue().asInt(0);
+            totalCount += Math.max(count, 0);
+
+            if (count <= 0) continue;
+
+            // 외부 키를 내부 카테고리(enum)로 매핑
+            Category category = Category.mapClassNameToCategory(key); // Category.mapClassNameToCategory("can") -> Category.CAN
+            if (category != null) { // 매핑 성공한 카테고리만 집계
+                detected.put(category, detected.getOrDefault(category, 0) + count);
             }
         }
-        int detectedCount = detected.getOrDefault(requiredCategory, 0);
 
-        // 검증
+        // 요구된 카테고리의 감지 개수
+        int detectedCount = detected.getOrDefault(requiredCategory, 0);
+        // detectedCount = detected.getOrDefault(CAN, 0) = 5 -> 개수 조건 충족
+
+        // 요구 외에 감지된 카테고리 목록(표시용)
+        List<String> otherDetected =
+                detected.entrySet().stream()
+                        .filter(e -> !e.getKey().equals(requiredCategory) && e.getValue() > 0)
+                        .map(e -> displayName(e.getKey()))
+                        .collect(Collectors.toList());
+        String othersBracket = otherDetected.isEmpty()
+                ? ""
+                : " [" + String.join(", ", otherDetected) + "]";
+
+
+        // 5) 검증
         boolean isVerified;
         String reason = null;
         String message;
 
-        if (!detected.containsKey(requiredCategory)) {
+        String reqDisp = displayName(requiredCategory);
+
+        if (detectedCount == 0) {
             isVerified = false;
             reason = "category";
-            message = "요구된 쓰레기 종류가 감지되지 않았습니다.";
+            // 요구 종류 미감지 + (대신 기타 감지 항목 안내)
+            message = "요구된 쓰레기 종류 '" + reqDisp + "'가 감지되지 않았습니다."
+                    + (otherDetected.isEmpty() ? "" : " 대신" + othersBracket + "가 감지되었습니다.");
         } else if (detectedCount < requiredCount) {
             isVerified = false;
             reason = "count";
-            message = "쓰레기 개수가 부족합니다. 최소 " + requiredCount + "개 필요합니다.";
+            // 개수 부족 + (기타 감지 항목 안내)
+            message = "쓰레기 개수가 부족합니다. '" + reqDisp + "' 최소 " + requiredCount + "개 필요합니다. (현재 " + detectedCount + "개)"
+                    + (otherDetected.isEmpty() ? "" : " 또한 요구 항목 외" + othersBracket + "가 감지되었습니다.");
         } else {
             isVerified = true;
-            message = "미션 인증에 성공했습니다.";
+            // 성공 + (기타 감지 항목 안내)
+            message = "미션 인증에 성공했습니다."
+                    + (otherDetected.isEmpty() ? "" : " 요구 항목 '" + reqDisp + "' 이외의 다른 쓰레기" + othersBracket + "가 감지되었습니다.");
         }
 
-        // 결과 저장
+
+        // 6) 결과 저장
         verificationRepository.save(MissionVerification.builder()
                 .userId(user.getId())
-                .totalCount(objects.size())
+                .totalCount(totalCount)
                 .types(detected.keySet().stream()
                         .map(Enum::name)
                         .toList())
@@ -110,16 +151,20 @@ public class MissionVerificationService {
                 .verifiedAt(LocalDateTime.now())
                 .build());
 
-        // UserMission 업데이트
+        // 7) UserMission 업데이트
         userMission.setIsVerified(isVerified);
         userMissionRepository.save(userMission);
 
-        // 응답 반환
+        // 8) 응답 반환
         Map<String, Object> response = new HashMap<>();
         response.put("verified", isVerified);
         response.put("message", message);
         if (!isVerified) response.put("reason", reason);
         return response;
+    }
+    private String displayName(Category category) {
+        // enum 이름을 소문자/스네이크 유지 가정.
+        return category.name().toLowerCase();
     }
 }
 

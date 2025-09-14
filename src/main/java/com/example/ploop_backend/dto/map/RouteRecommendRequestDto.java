@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Builder;
 
-import java.util.List;
 
+// 프론트 -> 백 요청 바디
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor

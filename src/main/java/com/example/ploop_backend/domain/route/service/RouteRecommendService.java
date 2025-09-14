@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// DB 반경조회 → AI 호출 → 응답 매핑.
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class RouteRecommendService {
             .build();
 
     private static final int DEFAULT_RADIUS_METERS = 5000; // 반경 5km
-    private static final int DEFAULT_LIMIT = 800;          // 과도한 페이로드 방지
+    private static final int DEFAULT_LIMIT = 800;          // 쓰레기/통 800개까지, 과도한 페이로드 방지
 
     // 출발지, 도착지 좌표 → 추천 경로 응답
     @Transactional(readOnly = true)

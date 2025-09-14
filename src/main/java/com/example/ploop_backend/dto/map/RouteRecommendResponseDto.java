@@ -10,6 +10,7 @@ import lombok.Builder;
 
 import java.util.List;
 
+// 백 -> 프론트 응답 바디
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor

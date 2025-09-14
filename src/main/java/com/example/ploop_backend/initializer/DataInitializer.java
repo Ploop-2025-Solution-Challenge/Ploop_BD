@@ -20,10 +20,10 @@ public class DataInitializer implements CommandLineRunner {
         if (missionRepository.count() == 0) {
             missionRepository.saveAll(List.of(
                     Mission.builder()
-                            .name("Pick up 1 empty can")
-                            .description("길가나 공원에 떨어진 빈 캔을 수거하세요.")
+                            .name("Pick up 2 empty cans")
+                            .description("길가나 공원에 떨어진 빈 캔 2개를 수거하세요.")
                             .category(Category.EMPTY_CAN)
-                            .requiredCount(1)
+                            .requiredCount(2)
                             .build(),
 
                     Mission.builder()

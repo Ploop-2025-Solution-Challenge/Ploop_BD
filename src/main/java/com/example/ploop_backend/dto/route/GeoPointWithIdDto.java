@@ -2,7 +2,7 @@ package com.example.ploop_backend.dto.route;
 
 import lombok.*;
 
-// id가 포함된 위도, 경도 좌표
+// AI에 넘길 쓰레기/쓰레기통 포인트(id, lat, lng).
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor

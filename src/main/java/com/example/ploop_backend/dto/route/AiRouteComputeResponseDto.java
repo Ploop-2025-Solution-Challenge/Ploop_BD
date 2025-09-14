@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.util.List;
 
+// AI에서 받은 경로 계산 응답 바디.
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
