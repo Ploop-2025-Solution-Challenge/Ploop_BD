@@ -3,12 +3,8 @@
 
 """
 FastAPI 서버
-- 요청으로 받은 temp_trash_data.json 형식(payload)을 그대로 보존하고,
-  success, message, waypoints, (성공 시) route 를 "추가"해서 응답.
-- destination 미제공 시:
-    * bins가 1개 이상이면 현재 위치에서 가장 가까운 bin을 destination으로 설정
-    * bins가 존재하지 않으면 현재 위치를 destination으로 설정
-- 파일 저장 없음. 콘솔에 응답 payload를 print.
+- /route/compute : 기존 경로 탐색(google_route.py)
+- /detect        : GPT-기반 쓰레기(6종) 개수 탐지
 """
 
 from fastapi import FastAPI, Request
@@ -16,12 +12,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
 
-
-# 비즈니스 로직 모듈
+# 비즈니스 로직 모듈 (경로 탐색)
 from google_route import handle_compute, invalid_json_response
+
+# GPT기반 탐지 모듈
 from trash_detection import TrashDetector, DetectionError
 
-app = FastAPI(title="Trash Routing Server", version="1.4.0")
+app = FastAPI(title="Trash Routing & Detection Server", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,12 +28,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Detector는 서버 기동 시 1회 로드하여 재사용(모델 재로딩 방지)
-detector = TrashDetector(
-    model_id="IDEA-Research/grounding-dino-base",
-    device_preference="cuda"  # "cuda" 또는 "cpu"
-)
+# Detector는 서버 기동 시 1회 로드하여 재사용
+detector = TrashDetector(model="gpt-4o")  # 필요시 gpt-4o-mini 등으로 변경 가능
 
+# ------------------------- 경로 탐색 -------------------------
 @app.post("/route/compute")
 async def compute_route(req: Request):
     """
@@ -51,19 +46,29 @@ async def compute_route(req: Request):
         # JSON 파싱 실패 시 통일된 에러 응답
         return invalid_json_response()
 
-    # 로직 처리는 전부 google_route로 위임
     return handle_compute(payload)
 
+# ------------------------- GPT 탐지 -------------------------
 @app.post("/detect")
 async def detect_endpoint(req: Request):
     """
     요청(JSON):
       { "image": "<base64 string>" }
 
-    응답(JSON): (성공)
-      { "success": true, "image": "<base64 PNG>", "objects": [str...], "bbox": [[x1,y1,x2,y2], ...] }
+    응답(JSON) 성공:
+      {
+        "success": true,
+        "results": {
+          "can": 0,
+          "plastic_bottle": 0,
+          "bottle_cap": 0,
+          "paper_cup": 0,
+          "plastic_bag": 0,
+          "trash_bin": 0
+        }
+      }
 
-    응답(JSON): (실패)
+    응답(JSON) 실패:
       { "success": false, "msg": "<이유>" }
     """
     try:
@@ -79,10 +84,8 @@ async def detect_endpoint(req: Request):
         return JSONResponse({"success": False, "msg": "field 'image' (base64 string) is required"}, status_code=200)
 
     try:
-        # 프롬프트와 임계값은 내부에서 고정 사용
-        result = detector.detect_from_base64(image_b64=image_b64)
+        result = detector.detect_counts_from_base64(image_b64=image_b64)
         return JSONResponse(result, status_code=200)
-
     except DetectionError as e:
         return JSONResponse({"success": False, "msg": str(e)}, status_code=200)
     except Exception as e:
@@ -90,5 +93,5 @@ async def detect_endpoint(req: Request):
 
 
 if __name__ == "__main__":
-    # uvicorn google_map_server:app --reload --port 8000
+    # 로컬 실행
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)

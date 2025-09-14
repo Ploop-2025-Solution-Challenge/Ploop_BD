@@ -9,3 +9,4 @@ googlemaps
 gmaps
 polyline
 transformers
+openai

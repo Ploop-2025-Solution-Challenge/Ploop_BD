@@ -1,107 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Trash Detection Demo</title>
-  <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background-color: #f5f5f5;
-      font-family: Arial, sans-serif;
-    }
-    #preview, #result {
-      max-width: 600px;
-      max-height: 400px;
-      margin: 15px 0;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      object-fit: contain;
-      background-color: white;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background-color: #007bff;
-      color: white;
-    }
-    button:disabled {
-      background-color: #aaa;
-    }
-  </style>
-</head>
-<body>
-  <h2>Trash Detection Demo</h2>
-
-  <!-- 이미지 업로드 -->
-  <input type="file" id="fileInput" accept="image/*">
-
-  <!-- 업로드한 원본 미리보기 -->
-  <img id="preview" alt="Uploaded image will appear here">
-
-  <!-- Detect 요청 버튼 -->
-  <button id="detectBtn" disabled>Detect</button>
-
-  <!-- 탐지 결과 시각화 -->
-  <h3>Detection Result</h3>
-  <img id="result" alt="Detection result will appear here">
-
-  <script>
-    const fileInput = document.getElementById("fileInput");
-    const preview = document.getElementById("preview");
-    const detectBtn = document.getElementById("detectBtn");
-    const resultImg = document.getElementById("result");
-
-    let base64Image = null;
-
-    // 1. 파일 업로드 시 미리보기 + base64 저장
-    fileInput.addEventListener("change", () => {
-      const file = fileInput.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        base64Image = e.target.result;  // data:image/...;base64,xxx
-        preview.src = base64Image;
-        detectBtn.disabled = false;
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // 2. Detect 요청
-    detectBtn.addEventListener("click", async () => {
-      if (!base64Image) return alert("이미지를 업로드하세요.");
-
-      detectBtn.disabled = true;
-      detectBtn.innerText = "Detecting...";
-
-      try {
-        const response = await fetch("http://localhost:8000/detect", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image: base64Image })
-        });
-
-        const data = await response.json();
-        if (data.success) {
-          // 서버에서 온 base64 PNG 시각화
-          resultImg.src = "data:image/png;base64," + data.image;
-        } else {
-          alert("Detection failed: " + data.msg);
-        }
-      } catch (err) {
-        alert("Error: " + err);
-      } finally {
-        detectBtn.disabled = false;
-        detectBtn.innerText = "Detect";
+  <head>
+    <meta charset="UTF-8" />
+    <title>Trash Detection Demo</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: #f5f5f5;
+        font-family: Arial, sans-serif;
       }
-    });
-  </script>
-</body>
+      #preview,
+      #result {
+        max-width: 600px;
+        max-height: 400px;
+        margin: 15px 0;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        object-fit: contain;
+        background-color: white;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        background-color: #007bff;
+        color: white;
+      }
+      button:disabled {
+        background-color: #aaa;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Trash Detection Demo</h2>
+
+    <!-- 이미지 업로드 -->
+    <input type="file" id="fileInput" accept="image/*" />
+
+    <!-- 업로드한 원본 미리보기 -->
+    <img id="preview" alt="Uploaded image will appear here" />
+
+    <!-- Detect 요청 버튼 -->
+    <button id="detectBtn" disabled>Detect</button>
+
+    <!-- 탐지 결과 시각화 -->
+    <h3>Detection Result</h3>
+    <img id="result" alt="Detection result will appear here" />
+
+    <script>
+      const fileInput = document.getElementById("fileInput");
+      const preview = document.getElementById("preview");
+      const detectBtn = document.getElementById("detectBtn");
+      const resultImg = document.getElementById("result");
+
+      let base64Image = null;
+
+      // 1. 파일 업로드 시 미리보기 + base64 저장
+      fileInput.addEventListener("change", () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          base64Image = e.target.result; // data:image/...;base64,xxx
+          preview.src = base64Image;
+          detectBtn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // 2. Detect 요청
+      detectBtn.addEventListener("click", async () => {
+        if (!base64Image) return alert("이미지를 업로드하세요.");
+
+        detectBtn.disabled = true;
+        detectBtn.innerText = "Detecting...";
+
+        try {
+          const response = await fetch("http://localhost:8000/detect", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: base64Image }),
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            // 서버에서 온 base64 PNG 시각화
+            resultImg.src = "data:image/png;base64," + data.image;
+            // console log를 이용하여 받은 데이터 전부 출력
+            console.log(data);
+          } else {
+            alert("Detection failed: " + data.msg);
+          }
+        } catch (err) {
+          alert("Error: " + err);
+        } finally {
+          detectBtn.disabled = false;
+          detectBtn.innerText = "Detect";
+        }
+      });
+    </script>
+  </body>
 </html>
