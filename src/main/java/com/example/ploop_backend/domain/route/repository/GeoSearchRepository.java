@@ -30,7 +30,7 @@ public class GeoSearchRepository {
     // 거리 계산 및 정렬: ST_Distance_Sphere(POINT, POINT) (미터 단위)
     private static final String QUERY_TEMPLATE = """
         SELECT 
-            ST_Y(location) AS lat,
+            ST_Y(LatLngDto) AS lat,
             ST_X(location) AS lng
         FROM %s
         WHERE ST_Distance_Sphere(
