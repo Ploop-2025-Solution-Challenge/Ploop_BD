@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class MissionVerificationService {
 
     private final WebClient webClient = WebClient.builder()
-            .baseUrl("http://localhost:8000")
+            .baseUrl("http://13.124.215.254:8082")
             .build();
 
     private final MissionVerificationRepository verificationRepository;
