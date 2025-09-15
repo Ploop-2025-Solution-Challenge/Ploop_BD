@@ -26,7 +26,7 @@ public class RouteRecommendService {
 
     // ⚠️ 실제 AI 서버 주소로 변경해 주세요.
     private final WebClient webClient = WebClient.builder()
-            .baseUrl("http://route-ai:8000")
+            .baseUrl("http://localhost:8000")
             .build();
 
     private static final int DEFAULT_RADIUS_METERS = 5000; // 반경 5km
