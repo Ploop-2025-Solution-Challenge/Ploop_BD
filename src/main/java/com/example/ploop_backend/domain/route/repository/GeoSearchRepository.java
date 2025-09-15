@@ -29,19 +29,17 @@ public class GeoSearchRepository {
 
     // 거리 계산 및 정렬: ST_Distance_Sphere(POINT, POINT) (미터 단위)
     private static final String QUERY_TEMPLATE = """
-        SELECT 
-            ST_Y(LatLngDto) AS lat,
-            ST_X(location) AS lng
-        FROM %s
-        WHERE ST_Distance_Sphere(
-                  location,
-                  ST_SRID(POINT(:lng, :lat), 4326)
-              ) <= :radius
-        ORDER BY ST_Distance_Sphere(
-                  location,
-                  ST_SRID(POINT(:lng, :lat), 4326)
-              ) ASC
-        LIMIT :limit
+            SELECT t.lat AS lat, t.lng AS lng
+              FROM %s t
+              WHERE ST_Distance_Sphere(
+                      POINT(t.lng, t.lat),
+                      ST_SRID(POINT(:lng,:lat), 4326)
+                    ) <= :radius
+              ORDER BY ST_Distance_Sphere(
+                      POINT(t.lng, t.lat),
+                      ST_SRID(POINT(:lng,:lat), 4326)
+                    ) ASC
+              LIMIT :limit
         """;
 
     public List<LatLngDto> findBinsWithin(LatLngDto center, int radiusMeters, int limit) {
