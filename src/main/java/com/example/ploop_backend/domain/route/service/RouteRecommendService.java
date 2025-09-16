@@ -56,14 +56,23 @@ public class RouteRecommendService {
                 .retryWhen(Retry.backoff(2, Duration.ofMillis(300)))
                 .block();
 
+        log.info("AI 서버 응답 : {}", aiRes);
+
         // 4) 프론트 응답으로 매핑
         RouteRecommendResponseDto res = new RouteRecommendResponseDto();
         res.setCurrent(req.getCurrent());
         res.setDestination(req.getDestination());
         if (aiRes == null) {
             res.setSuccess(false);
-            res.setMessage("route-ai no response");
+            res.setMessage("route-ai 응답 없음");
             res.setWaypoints(List.of());
+            res.setRoute(new RouteSummaryDto("", 0, "0s"));
+            return res;
+        }
+        if (aiRes.getRoute() == null) {
+            res.setSuccess(false);
+            res.setMessage("AI 응답에 route 없음");
+            res.setWaypoints(aiRes.getWaypoints() != null ? aiRes.getWaypoints() : List.of());
             res.setRoute(new RouteSummaryDto("", 0, "0s"));
             return res;
         }

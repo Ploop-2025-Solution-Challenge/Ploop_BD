@@ -1,5 +1,6 @@
 package com.example.ploop_backend.dto.route;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public class AiRouteComputeResponseDto {
     private boolean success;      // 예: true
     private String message;       // 예: "ok"
     private List<LatLngDto> waypoints;
+
+    @JsonProperty("routeSummary")
     private RouteSummaryDto route;
 }
 
