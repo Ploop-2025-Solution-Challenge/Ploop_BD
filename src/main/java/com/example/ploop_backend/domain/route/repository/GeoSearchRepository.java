@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * 반경 내(미터 단위) 쓰레기통/쓰레기 좌표를 조회하는 네이티브 쿼리 리포지토리.
  * - MySQL 8.x, POINT(SRID 4326), SPATIAL INDEX 가정
- * - 테이블명은 예시: trash_bin, trash_spot  (프로젝트 테이블명과 다르면 아래 상수만 수정)
+ * - 테이블명은 예시: trash_bin, trash_spot
  *
  * 성능 팁:
  *  - ALTER TABLE trash_bin  ADD SPATIAL INDEX idx_bin_loc  (location);
@@ -42,10 +42,16 @@ public class GeoSearchRepository {
             LIMIT :limit;
         """;
 
+    /**
+     * 반경 내 쓰레기통 좌표 조회
+     */
     public List<LatLngDto> findBinsWithin(LatLngDto center, int radiusMeters, int limit) {
         return query(TABLE_BINS, center, radiusMeters, limit);
     }
 
+    /**
+     * 반경 내 쓰레기 spot 좌표 조회
+     */
     public List<LatLngDto> findSpotsWithin(LatLngDto center, int radiusMeters, int limit) {
         return query(TABLE_SPOTS, center, radiusMeters, limit);
     }
