@@ -33,11 +33,11 @@ public class GeoSearchRepository {
             FROM %s t
             WHERE ST_Distance_Sphere(
                     POINT(t.longitude, t.latitude),
-                    ST_SRID(POINT(:lng, :lat), 4326)
+                    POINT(:lng, :lat)
                 ) <= :radius
             ORDER BY ST_Distance_Sphere(
                     POINT(t.longitude, t.latitude),
-                    ST_SRID(POINT(:lng, :lat), 4326)
+                    POINT(:lng, :lat)
                 ) ASC
             LIMIT :limit;
         """;
