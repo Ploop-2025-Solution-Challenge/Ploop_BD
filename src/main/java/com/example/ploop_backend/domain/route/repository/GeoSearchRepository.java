@@ -29,18 +29,17 @@ public class GeoSearchRepository {
 
     // 거리 계산 및 정렬: ST_Distance_Sphere(POINT, POINT) (미터 단위)
     private static final String QUERY_TEMPLATE = """
-            SELECT t.latitude AS lat, t.longitude AS lng
-                              FROM trash_bin t
-                              WHERE ST_Distance_Sphere(
-                                      POINT(t.longitude, t.latitude),
-                                      ST_SRID(POINT(?, ?), 4326)
-                                    ) <= ?
-                              ORDER BY ST_Distance_Sphere(
-                                      POINT(t.longitude, t.latitude),
-                                      ST_SRID(POINT(?, ?), 4326)
-                                    ) ASC
-                              LIMIT ?;
-                              
+            SELECT t.lat AS lat, t.lng AS lng
+            FROM trash_bin t
+            WHERE ST_Distance_Sphere(
+                    POINT(t.longitude, t.latitude),
+                    ST_SRID(POINT(?, ?), 4326)
+                ) <= ?
+            ORDER BY ST_Distance_Sphere(
+                    POINT(t.longitude, t.latitude),
+                    ST_SRID(POINT(?, ?), 4326)
+                ) ASC
+            LIMIT ?;
         """;
 
     public List<LatLngDto> findBinsWithin(LatLngDto center, int radiusMeters, int limit) {
