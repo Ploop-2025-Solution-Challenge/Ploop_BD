@@ -1,5 +1,4 @@
 import os
-import cv2
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -8,12 +7,11 @@ from fastapi import FastAPI, File, UploadFile, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
-import cv2
 import os
 import tempfile
 import base64
 from matcher import process_new_user, init_pinecone, get_mysql_connection, setup_scheduler
-from detector import detect_trash
+# from detector import detect_trash
 import threading
 
 
@@ -54,46 +52,46 @@ async def startup_event():
 
 
 
-@app.post("/detect/upload")
-async def detect_from_upload(file: UploadFile = File(...)):
-    """
-    업로드된 이미지 파일에서 객체 감지를 수행합니다.
-    """
-    try:
-        # Get the file extension from the uploaded file
-        file_extension = os.path.splitext(file.filename)[1]
+# @app.post("/detect/upload")
+# async def detect_from_upload(file: UploadFile = File(...)):
+#     """
+#     업로드된 이미지 파일에서 객체 감지를 수행합니다.
+#     """
+#     try:
+#         # Get the file extension from the uploaded file
+#         file_extension = os.path.splitext(file.filename)[1]
 
-        # Create a temporary file with the correct extension
-        with tempfile.NamedTemporaryFile(suffix=file_extension, delete=False) as temp_file:
-            temp_file_path = temp_file.name
+#         # Create a temporary file with the correct extension
+#         with tempfile.NamedTemporaryFile(suffix=file_extension, delete=False) as temp_file:
+#             temp_file_path = temp_file.name
 
-            # Save the uploaded file content
-            content = await file.read()
-            temp_file.write(content)
+#             # Save the uploaded file content
+#             content = await file.read()
+#             temp_file.write(content)
 
-        try:
-            # 객체 감지 수행
-            json_result, result_plot, _ = detect_trash(temp_file_path)
+#         try:
+#             # 객체 감지 수행
+#             json_result, result_plot, _ = detect_trash(temp_file_path)
 
-            # 결과 이미지 저장
-            result_filename = f"{RESULTS_DIR}/result_{file.filename}"
-            cv2.imwrite(result_filename, result_plot)
+#             # 결과 이미지 저장
+#             result_filename = f"{RESULTS_DIR}/result_{file.filename}"
+#             cv2.imwrite(result_filename, result_plot)
 
-            # 이미지를 Base64로 인코딩
-            _, buffer = cv2.imencode('.jpg', result_plot)
-            img_base64 = base64.b64encode(buffer).decode('utf-8')
+#             # 이미지를 Base64로 인코딩
+#             _, buffer = cv2.imencode('.jpg', result_plot)
+#             img_base64 = base64.b64encode(buffer).decode('utf-8')
 
-            return {
-                "detection_results": json_result,
-                "result_image_base64": f"data:image/jpeg;base64,{img_base64}"
-            }
+#             return {
+#                 "detection_results": json_result,
+#                 "result_image_base64": f"data:image/jpeg;base64,{img_base64}"
+#             }
 
-        finally:
-            # 임시 파일 삭제
-            os.unlink(temp_file_path)
+#         finally:
+#             # 임시 파일 삭제
+#             os.unlink(temp_file_path)
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"객체 감지 중 오류 발생: {str(e)}")
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"객체 감지 중 오류 발생: {str(e)}")
 
 
 
