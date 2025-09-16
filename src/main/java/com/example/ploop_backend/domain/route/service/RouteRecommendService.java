@@ -4,6 +4,7 @@ import com.example.ploop_backend.domain.route.repository.GeoSearchRepository;
 import com.example.ploop_backend.dto.map.RouteRecommendRequestDto;
 import com.example.ploop_backend.dto.map.RouteRecommendResponseDto;
 import com.example.ploop_backend.dto.route.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,13 @@ public class RouteRecommendService {
                 .timeout(Duration.ofSeconds(8))
                 .retryWhen(Retry.backoff(2, Duration.ofMillis(300)))
                 .block();
+
+        try {
+            String json = new ObjectMapper().writeValueAsString(aiRes);
+            log.info("AI 서버 응답(JSON) = {}", json);
+        } catch (Exception e) {
+            log.error("AI 응답 로그 변환 실패", e);
+        }
 
         log.info("AI 서버 응답 : {}", aiRes);
 
