@@ -29,17 +29,17 @@ public class GeoSearchRepository {
 
     // 거리 계산 및 정렬: ST_Distance_Sphere(POINT, POINT) (미터 단위)
     private static final String QUERY_TEMPLATE = """
-            SELECT t.lat AS lat, t.lng AS lng
-            FROM trash_bin t
+            SELECT t.latitude AS lat, t.longitude AS lng
+            FROM %s t
             WHERE ST_Distance_Sphere(
                     POINT(t.longitude, t.latitude),
-                    ST_SRID(POINT(?, ?), 4326)
-                ) <= ?
+                    ST_SRID(POINT(:lng, :lat), 4326)
+                ) <= :radius
             ORDER BY ST_Distance_Sphere(
                     POINT(t.longitude, t.latitude),
-                    ST_SRID(POINT(?, ?), 4326)
+                    ST_SRID(POINT(:lng, :lat), 4326)
                 ) ASC
-            LIMIT ?;
+            LIMIT :limit;
         """;
 
     public List<LatLngDto> findBinsWithin(LatLngDto center, int radiusMeters, int limit) {
@@ -52,12 +52,14 @@ public class GeoSearchRepository {
 
     private List<LatLngDto> query(String table, LatLngDto c, int radius, int limit) {
         String sql = QUERY_TEMPLATE.formatted(table);
+
         Map<String, Object> params = Map.of(
                 "lng", c.getLng(),
                 "lat", c.getLat(),
                 "radius", radius,
                 "limit", Math.max(1, limit)
         );
+
         return jdbc.query(sql, params, (rs, i) ->
                 new LatLngDto(rs.getDouble("lat"), rs.getDouble("lng"))
         );
