@@ -74,21 +74,21 @@ public class RouteRecommendService {
             res.setSuccess(false);
             res.setMessage("route-ai 응답 없음");
             res.setWaypoints(List.of());
-            res.setRoute(new RouteSummaryDto("", 0, "0s"));
+            res.setRoute(new RouteDto("", 0, "0s"));
             return res;
         }
         if (aiRes.getRoute() == null) {
             res.setSuccess(false);
             res.setMessage("AI 응답에 route 없음");
             res.setWaypoints(aiRes.getWaypoints() != null ? aiRes.getWaypoints() : List.of());
-            res.setRoute(new RouteSummaryDto("", 0, "0s"));
+            res.setRoute(new RouteDto("", 0, "0s"));
             return res;
         }
         res.setSuccess(aiRes.isSuccess());
         res.setMessage(aiRes.getMessage());
         res.setWaypoints(aiRes.getWaypoints());
 
-        RouteSummaryDto routeSummary = new RouteSummaryDto();
+        RouteDto routeSummary = new RouteDto();
         routeSummary.setEncodedPolyline(aiRes.getRoute().getEncodedPolyline());
         routeSummary.setDistanceMeters(aiRes.getRoute().getDistanceMeters());
         routeSummary.setDuration(aiRes.getRoute().getDuration());

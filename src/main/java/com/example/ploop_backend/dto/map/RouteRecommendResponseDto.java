@@ -1,7 +1,7 @@
 package com.example.ploop_backend.dto.map;
 
 import com.example.ploop_backend.dto.route.LatLngDto;
-import com.example.ploop_backend.dto.route.RouteSummaryDto;
+import com.example.ploop_backend.dto.route.RouteDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,5 +24,5 @@ public class RouteRecommendResponseDto {
 
     private List<LatLngDto> waypoints; // [{lat,lng}, ...]
 
-    private RouteSummaryDto route;     // {encodedPolyline, distanceMeters, duration}
+    private RouteDto route;     // {encodedPolyline, distanceMeters, duration}
 }

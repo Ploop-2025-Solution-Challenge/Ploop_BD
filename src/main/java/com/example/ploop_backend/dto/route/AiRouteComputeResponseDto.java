@@ -22,7 +22,7 @@ public class AiRouteComputeResponseDto {
     private String message;       // 예: "ok"
     private List<LatLngDto> waypoints;
 
-    @JsonProperty("routeSummary")
-    private RouteSummaryDto route;
+    @JsonProperty("route")
+    private RouteDto route;
 }
 
