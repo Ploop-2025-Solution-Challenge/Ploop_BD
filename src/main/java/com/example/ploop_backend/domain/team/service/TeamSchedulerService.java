@@ -27,7 +27,7 @@ public class TeamSchedulerService {
             log.info("!!!!! UserMission -> UserMissionHistory stored");
 
             // 팀 매칭 실행
-            teamMatchService.matchWeeklyTeams();
+            //teamMatchService.matchWeeklyTeams();
             // 미션 할당
             teamMatchService.assignWeeklyMissions();
             log.info("!!!!! every week, team matching finished");
