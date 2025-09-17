@@ -18,7 +18,7 @@ public class TeamSchedulerService {
     private final UserMissionStoringService userMissionStoringService;
 
     // 한국 기준 매주 월요일 오전 9시에 실행 (cron: 초 분 시 일 월 요일)
-    @Scheduled(cron = "0 0 0 * * MON", zone = "UTC")
+    @Scheduled(cron = "0 10 18 * * WED", zone = "UTC")
     public void scheduleWeeklyTeamMatching() {
         log.info("!!!!! every week, storing mission count sum, matching schedular start");
         try {
