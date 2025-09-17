@@ -33,7 +33,6 @@ public class TeamMatchService {
 
     @Transactional
     public void matchWeeklyTeams() {
-
         // AI 매칭 결과 가져오기 -> 수정함
         webClient.post()
                 .uri("/api/run_matching")

@@ -24,26 +24,34 @@ public class TeamSchedulerService {
     private final TeamMissionRepository teamMissionRepository;
     private final UserMissionStoringService userMissionStoringService;
 
-    // 한국 기준 매주 월요일 오전 9시에 실행 (cron: 초 분 시 일 월 요일)
-    @Scheduled(cron = "0 10 18 * * WED", zone = "UTC")
+    // 한국 기준 매주 목요일 오전 3시 13분 실행 (UTC 수요일 18:13)
+    @Scheduled(cron = "0 22 18 * * WED", zone = "UTC")
     public void scheduleWeeklyTeamMatching() {
-        log.info("!!!!! every week, storing mission count sum, matching schedular start");
-        try {
-            // 이전 미션 백업
-            userMissionStoringService.storeAllVerifiedUserMissions();
-            log.info("!!!!! UserMission -> UserMissionHistory stored");
+        log.info("===== [Scheduler] START: Weekly team matching job triggered =====");
+        long start = System.currentTimeMillis();
 
+        try { // 이전 미션 백업
+            log.debug("[Scheduler] Step 1: Storing all verified user missions...");
+            userMissionStoringService.storeAllVerifiedUserMissions();
+            log.info("[Scheduler] ✅ UserMission -> UserMissionHistory stored");
+
+            log.debug("[Scheduler] Step 2: Clearing weekly data (Team, UserMission, TeamMission)...");
+            teamRepository.deleteAll();
+            userMissionRepository.deleteAll();
+            teamMissionRepository.deleteAll();
+            log.info("[Scheduler] ✅ Weekly data cleared");
 
             // 팀 매칭 실행
-            //teamMatchService.matchWeeklyTeams();
-            teamRepository.deleteAll(); // 매주 초기화
-            userMissionRepository.deleteAll(); // 매주 초기화
-            teamMissionRepository.deleteAll(); // 매주 초기화
-            // 미션 할당
+
+            log.debug("[Scheduler] Step 3: Assigning new weekly missions...");
             teamMatchService.assignWeeklyMissions();
-            log.info("!!!!! every week, team matching finished");
+            log.info("[Scheduler] ✅ Weekly missions assigned successfully");
+
+            long elapsed = System.currentTimeMillis() - start;
+            log.info("===== [Scheduler] END: Weekly team matching finished (took {} ms) =====", elapsed);
+
         } catch (Exception e) {
-            log.error("!?!?! fail matching system", e);
+            log.error("[Scheduler] ❌ Failed to run weekly team matching", e);
         }
     }
 }
