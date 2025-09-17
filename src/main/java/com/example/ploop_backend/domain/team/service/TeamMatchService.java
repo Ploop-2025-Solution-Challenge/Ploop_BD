@@ -37,7 +37,7 @@ public class TeamMatchService {
         userMissionRepository.deleteAll(); // 매주 초기화
         teamMissionRepository.deleteAll(); // 매주 초기화
 
-        // AI 매칭 결과 가져오기
+        // AI 매칭 결과 가져오기 -> 수정함
         webClient.post()
                 .uri("/api/run_matching")
                 .retrieve()
