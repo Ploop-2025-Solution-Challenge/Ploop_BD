@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@RestController
 public class TeamSchedulerService {
 
     private final TeamMatchService teamMatchService;
@@ -25,7 +24,7 @@ public class TeamSchedulerService {
     private final UserMissionStoringService userMissionStoringService;
 
     // 한국 기준 매주 목요일 오전 3시 13분 실행 (UTC 수요일 18:13)
-    @Scheduled(cron = "0 45 18 * * WED", zone = "UTC")
+    @Scheduled(cron = "0 52 18 * * WED", zone = "UTC")
     public void scheduleWeeklyTeamMatching() {
         log.info("===== [Scheduler] START: Weekly team matching job triggered =====");
         long start = System.currentTimeMillis();
