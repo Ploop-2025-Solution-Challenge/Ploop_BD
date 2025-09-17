@@ -33,9 +33,6 @@ public class TeamMatchService {
 
     @Transactional
     public void matchWeeklyTeams() {
-        teamRepository.deleteAll(); // 매주 초기화
-        userMissionRepository.deleteAll(); // 매주 초기화
-        teamMissionRepository.deleteAll(); // 매주 초기화
 
         // AI 매칭 결과 가져오기 -> 수정함
         webClient.post()
