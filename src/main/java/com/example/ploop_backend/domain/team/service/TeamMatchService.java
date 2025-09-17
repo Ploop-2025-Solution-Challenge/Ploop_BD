@@ -28,7 +28,7 @@ public class TeamMatchService {
     private final UserMissionRepository userMissionRepository;
 
     private final WebClient webClient = WebClient.builder()
-            .baseUrl("http://35.224.212.56:8000")
+            .baseUrl("http://13.124.215.254:8082")
             .build();
 
     @Transactional
@@ -39,7 +39,7 @@ public class TeamMatchService {
 
         // AI 매칭 결과 가져오기
         webClient.post()
-                .uri("/match/weekly")
+                .uri("/api/run_matching")
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block(); // 매칭 실행만
@@ -81,8 +81,6 @@ public class TeamMatchService {
         matchedTeams.forEach(teamMissionService::assignRandomMissionsToTeam);
         System.out.println("????? assignRandomMissionsToTeam called??");
     }
-
-
 
 
     // 로컬 테스트용 매칭 결과 저장
