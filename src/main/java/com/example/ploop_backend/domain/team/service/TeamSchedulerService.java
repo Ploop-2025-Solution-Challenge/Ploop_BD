@@ -25,7 +25,7 @@ public class TeamSchedulerService {
     private final UserMissionStoringService userMissionStoringService;
 
     // 한국 기준 매주 목요일 오전 3시 13분 실행 (UTC 수요일 18:13)
-    @Scheduled(cron = "0 26 18 * * WED", zone = "UTC")
+    @Scheduled(cron = "0 37 18 * * WED", zone = "UTC")
     public void scheduleWeeklyTeamMatching() {
         log.info("===== [Scheduler] START: Weekly team matching job triggered =====");
         long start = System.currentTimeMillis();
@@ -34,12 +34,6 @@ public class TeamSchedulerService {
             log.debug("[Scheduler] Step 1: Storing all verified user missions...");
             userMissionStoringService.storeAllVerifiedUserMissions();
             log.info("[Scheduler] ✅ UserMission -> UserMissionHistory stored");
-
-            log.debug("[Scheduler] Step 2: Clearing weekly data (Team, UserMission, TeamMission)...");
-            teamRepository.deleteAll();
-            userMissionRepository.deleteAll();
-            teamMissionRepository.deleteAll();
-            log.info("[Scheduler] ✅ Weekly data cleared");
 
             // 팀 매칭 실행
 
