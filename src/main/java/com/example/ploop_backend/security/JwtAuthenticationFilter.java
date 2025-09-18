@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("[JwtFilter] Authorization 헤더가 없거나 형식이 잘못됨. 필터 통과");
+            // System.out.println("[JwtFilter] Authorization 헤더가 없거나 형식이 잘못됨. 필터 통과");
             filterChain.doFilter(request, response); // JWT가 없으면 다음 필터로 넘김
             return;
         }

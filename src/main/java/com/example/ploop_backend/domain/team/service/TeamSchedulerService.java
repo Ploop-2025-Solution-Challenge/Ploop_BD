@@ -37,7 +37,7 @@ public class TeamSchedulerService {
     }
 
     // 한국 기준 매주 목요일 오후 12시 10분 실행 → 팀 미션 할당
-    @Scheduled(cron = "0 10 14 * * THU", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 17 15 * * THU", zone = "Asia/Seoul")
     public void assignWeeklyMissions() {
         log.info("===== [Scheduler] START: Weekly mission assignment job triggered =====");
         long start = System.currentTimeMillis();
