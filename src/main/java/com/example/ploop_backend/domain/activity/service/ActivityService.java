@@ -55,9 +55,18 @@ public class ActivityService {
             challengeGoal = 0; // 잘못된 range 값 처리
         }
 
-        // UserMission 테이블에서 기간 내 해당 유저가 isVerified가 true인 미션 개수 조회
-        int challengeCompleted = userMissionHistoryRepository.countByUserAndIsVerifiedTrueAndCreatedAtBetween(
-                user, startDate.atStartOfDay(), endDate.atTime(23, 59));
+        // ⭐ 변경함: UserMissionHistory + UserMission 둘 다 집계
+        int historyCount = userMissionHistoryRepository
+                .countByUserAndIsVerifiedTrueAndCreatedAtBetween(
+                        user, startDate.atStartOfDay(), endDate.atTime(23, 59));
+
+        int currentCount = userMissionRepository
+                .countByUserAndIsVerifiedTrueAndCreatedAtBetween(
+                        user, startDate.atStartOfDay(), endDate.atTime(23, 59));
+
+
+        // UserMissionHistory 테이블에서 기간 내 해당 유저가 isVerified가 true인 미션 개수 조회
+        int challengeCompleted = historyCount + currentCount; // ⭐ 변경힘
 
 
         return new ActivityStatsResponseDto(
