@@ -24,7 +24,7 @@ public class TeamSchedulerService {
     private final UserMissionStoringService userMissionStoringService;
 
     // 한국 기준 매주 목요일 오전 11시 50분에 실행 → 미션 백업
-    @Scheduled(cron = "0 30 14 * * THU", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 50 14 * * THU", zone = "Asia/Seoul")
     public void backupUserMissions() {
         log.info("===== [Scheduler] START: Weekly mission backup job triggered =====");
         try {
