@@ -70,6 +70,7 @@ public class AuthService {
 
         GoogleIdToken idToken = verifier.verify(idTokenString);
 
+        // aud와 azp가 다르면 Invalid ID Token
         if (idToken == null) {
             throw new RuntimeException("Invalid ID Token");
         }
