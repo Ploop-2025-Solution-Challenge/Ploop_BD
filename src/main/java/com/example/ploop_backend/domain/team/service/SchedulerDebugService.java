@@ -1,3 +1,4 @@
+/*
 package com.example.ploop_backend.domain.team.service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -16,3 +17,4 @@ public class SchedulerDebugService {
         log.info(">>> [DEBUG SCHEDULER] Triggered at {}", LocalDateTime.now());
     }
 }
+*/
